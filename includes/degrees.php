@@ -97,7 +97,7 @@ class Degrees extends WP_CLI_Command {
 	 * <catalog_url>
 	 * : The url of the undergraduate catalog. (Required)
 	 * 
-	 * [<--publish>]
+	 * [--publish]
 	 * : Publishes all the new degrees.
 	 * ## EXAMPLES
 	 * 
