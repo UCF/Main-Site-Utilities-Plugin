@@ -1,0 +1,6 @@
+1. Network problem reaching search service.
+2. JSON error.. unable to parse Search results
+3. No results returned from search service.
+4. Network problem reaching undergraduate catalog.
+5. JSON error.. enabled to parse Catalog programs
+6. No results returned from undergraduate catalog.
