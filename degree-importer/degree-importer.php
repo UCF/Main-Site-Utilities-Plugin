@@ -12,6 +12,7 @@ class Degree_Importer {
         $existing_count = 0, // Counter to count existing posts
         $new_posts, // Array to hold new posts
         $new_count = 0, // Counter to count new posts
+        $post_status,
         $program_types = array(
             'Undergraduate Program' => array(
                 'Undergraduate Degree',
@@ -23,14 +24,7 @@ class Degree_Importer {
                 'Graduate Degree',
                 'Certificate'
             )
-        ), // Array of default program_types
-        $doctoral = array(
-            'phd',
-            'md',
-            'dpt',
-            'edp',
-            'dnp'
-        ); // Array of doctoral abbreviations
+        ); // Array of default program_types
 
     /**
      * Constructor
@@ -47,7 +41,7 @@ class Degree_Importer {
         $this->catalog_programs = array();
         $this->existing_posts = array();
         $this->new_posts = array();
-        $thos->post_status = $post_status;
+        $this->post_status = $post_status;
     }
 
     /**
@@ -345,29 +339,18 @@ class Degree_Importer {
      * @return string | The program suffix
      **/
     private function get_program_suffix( $name, $type, $graduate ) {
-        if ( $graduate === 0 ) {
-            if ( $type === 'major' ) {
-                return '';
-            } else if ( $type === 'minor' ) {
+        $lower_name = strtolower( $name );
+
+        switch( $type ) {
+            case 'minor':
                 return '-minor';
-            }
-        } else {
-            if ( $type === 'certificate' ) {
-                return '-certificate';
-            }
-
-            $lower_name = strtolower( $name );
-            $suffix = '-master';
-            foreach( $this->doctoral as $abbr ) {
-                if ( stripos( $lower_name, $abbr ) !== false ) {
-                    $suffix = '-doctorate';
+            case 'certificate':
+                if ( stripos( $lower_name, 'certificate' ) === false ) {
+                    return '-certificate';
                 }
-            }
-
-            return $suffix;
+            default:
+                return '';
         }
-
-        return '';
     }
 
     /**
@@ -476,16 +459,17 @@ class Degree_Importer {
                 'post_type'   => 'degree',
             ),
             'post_meta'  => array(
-                'degree_id'          => $program->degree_id,
-                'degree_type_id'     => $program->type_id,
-                'degree_hours'       => $program->required_hours,
-                'degree_description' => html_entity_decode( $program->description ),
-                'degree_website'     => $program->website,
-                'degree_phone'       => $program->phone,
-                'degree_email'       => $program->email,
-                'degree_contacts'    => $program->contacts,
-                'degree_pdf'         => $program->catalog_url,
-                'degree_is_graduate' => $program->graduate
+                'degree_id'              => $program->degree_id,
+                'degree_type_id'         => $program->type_id,
+                'degree_hours'           => $program->required_hours,
+                'degree_description'     => html_entity_decode( $program->description ),
+                'degree_website'         => $program->website,
+                'degree_phone'           => $program->phone,
+                'degree_email'           => $program->email,
+                'degree_contacts'        => $program->contacts,
+                'degree_pdf'             => $program->catalog_url,
+                'degree_is_graduate'     => $program->graduate,
+                'page_header_height' => 'header-media-default'
             ),
             'post_terms' => array(
                 'program_types' => $program->type,
