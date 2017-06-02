@@ -7,15 +7,14 @@ class Degree_Importer {
 		$search_api, // The url of the search api
 		$catalog_api, // The url of the undergraduate catalog api
 		$search_results, // The search results
-		$result_count,
+		$result_count, // Count of results returned from search service
 		$catalog_programs, // The undergaduate catalog results
 		$existing_posts, // Array to hold existing posts
 		$existing_count = 0, // Counter to count existing posts
 		$new_posts, // Array to hold new posts
 		$new_count = 0, // Counter to count new posts
 		$removed_count = 0, // Counter to count removed posts
-		$updated_posts,
-		$duplicate_count = 0,
+		$duplicate_count = 0, // Counter to count duplicate records processed.
 		$program_types = array(
 			'Undergraduate Program' => array(
 				'Undergraduate Degree',
