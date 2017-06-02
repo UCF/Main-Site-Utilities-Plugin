@@ -264,7 +264,7 @@ class Degree_Importer {
 
             $degree_id = isset( $post_meta['degree_id'] ) ? $post_meta['degree_id'] : null;
             $degree_type_id = isset( $post_meta['degree_type_id'] ) ? $post_meta['degree_type_id'] : null;
-			$program_types = isset( $post_meta['program_types'] ) ? $post_meta['program_types'] : null;
+			$program_types = isset( $post_terms['program_types'] ) ? $post_terms['program_types'] : null;
 
             $post_id = $this->process_post( $post_data, $degree_id, $degree_type_id, $program_types );
             $this->process_post_meta( $post_id, $post_meta );
@@ -380,6 +380,13 @@ class Degree_Importer {
         return $college_name;
     }
 
+	/**
+	 * Formats contact data into an array for ACF repeater field
+	 * @author Jim Barnes
+	 * @since 1.0.0
+	 * @param $contacts Array | An array of contact data
+	 * @return Array
+	 **/
     private function format_contacts( $contacts ) {
         if ( ! $contacts ) {
             return null;
@@ -528,12 +535,14 @@ class Degree_Importer {
             );
         }
 
+		var_dump( $args );
+
         $existing_post = get_posts( $args );
         $existing_post = empty( $existing_post ) ? false : $existing_post[0];
 
         if ( $existing_post !== false ) {
             $retval = $existing_post->ID;
-            $post_data['ID'] = $post_id;
+            $post_data['ID'] = $retval;
             $post_data['post_status'] = $existing_post->post_status;
 
             // Remove the post name so we're not updating permalinks
