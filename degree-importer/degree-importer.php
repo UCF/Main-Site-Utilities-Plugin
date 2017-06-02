@@ -524,6 +524,9 @@ class Degree_Importer {
             $post_data['ID'] = $post_id;
             $post_data['post_status'] = $existing_post->post_status;
 
+			// Remove the post name so we're not updating permalinks
+			unset( $post_data['post_name'] );
+
             // Remove the post date so publish date stays the same.
             unset( $post_data['post_date'] );
 
