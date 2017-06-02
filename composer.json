@@ -14,7 +14,7 @@
     ],
     "autoload": {
         "files": [
-            "utility.php"
+            "commands.php"
         ]
     }
 }
