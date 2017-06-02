@@ -51,7 +51,6 @@ class Degree_Importer {
 	 * Imports the degres into WordPress
 	 * @author Jim Barnes
 	 * @since 1.0.0
-	 * @return Degree_Importer_Status|Degree_Importer_Exception
 	 **/
 	public function import() {
 		try {

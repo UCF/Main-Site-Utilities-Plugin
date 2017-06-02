@@ -123,6 +123,36 @@ class Degrees extends WP_CLI_Command {
 	}
 
 	/**
+	 * Updates tuition and fee information on degrees
+	 *
+	 * ## OPTIONS
+	 *
+	 * <api>
+	 * : The url of the tuition and fees feed you want to pull from. (Required)
+	 *
+	 * ## EXAMPLES
+	 *
+	 * # Imports degrees from the dev search service.
+	 * $ wp mainsite degrees tuition http://www.studentaccounts.ucf.edu/feed/feed.cfm
+	 *
+	 * @when after_wp_load
+	 */
+	public function tuition( $args, $assoc_args ) {
+		$api = $args[0];
+
+		$import = new Tuition_Fees_Importer( $api );
+
+		try {
+			$import->import();
+		}
+		catch( Exception $e ) {
+			WP_CLI::error( $e->getMessage(), $e->getCode() );
+		}
+
+		WP_CLI::success( $import->get_stats() );
+	}
+
+	/**
 	 * Converts post meta to the v3 format
 	 **/
 	private function convert_post_meta( $post ) {
