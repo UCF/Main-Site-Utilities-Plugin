@@ -14,7 +14,8 @@ class Degree_Importer {
 		$new_posts, // Array to hold new posts
 		$new_count = 0, // Counter to count new posts
 		$removed_count = 0, // Counter to count removed posts
-		$duplicate_count = 0, // Counter to count duplicate records processed.
+		$updated_posts, // Array to store posts that are updated
+		$duplicate_count = 0, // Counter to count duplicate records processed
 		$program_types = array(
 			'Undergraduate Program' => array(
 				'Undergraduate Degree',
