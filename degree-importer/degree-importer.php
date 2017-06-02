@@ -5,14 +5,15 @@
 class Degree_Importer {
     private
         $search_api, // The url of the search api
-        $catalog_api, // The url of the catalog api
+        $catalog_api, // The url of the undergraduate catalog api
         $search_results, // The search results
-        $catalog_programs, // The catalog results
+        $catalog_programs, // The undergaduate catalog results
         $existing_posts, // Array to hold existing posts
         $existing_count = 0, // Counter to count existing posts
         $new_posts, // Array to hold new posts
         $new_count = 0, // Counter to count new posts
-        $post_status,
+        $removed_count = 0,
+        $publish,
         $program_types = array(
             'Undergraduate Program' => array(
                 'Undergraduate Degree',
@@ -34,14 +35,14 @@ class Degree_Importer {
      * @param $catalog_url string | The url to the undergraduate catalog
      * @return DegreeImporter
      **/
-    public function __construct( $search_url, $catalog_url, $post_status='draft' ) {
+    public function __construct( $search_url, $catalog_url, $publish=false ) {
         $this->search_api = $search_url;
         $this->catalog_api = $catalog_url;
         $this->search_results = array();
         $this->catalog_programs = array();
         $this->existing_posts = array();
         $this->new_posts = array();
-        $this->post_status = $post_status;
+        $this->publish = $publish;
     }
 
     /**
@@ -58,8 +59,14 @@ class Degree_Importer {
 
             // Create the program types
             $this->create_program_types();
-
+            // Create the new degrees
             $this->process_degrees();
+            // Remove degrees that are no longer in the search service.
+            $this->remove_remaining_existing();
+            // If we're publishing new, publish them now
+            if ( $this->publish ) {
+				$this->publish_new_degrees();
+            }
         }
         catch (Degree_Importer_Exception $die) {
             throw $die;
@@ -149,7 +156,7 @@ class Degree_Importer {
             }
         } else {
             throw new Degree_Importer_Exception(
-                'Failed to conntect to the undergraduate catalog. ' .
+                'Failed to connect to the undergraduate catalog. ' .
                 'Please make sure your catalog url is correct.',
                 4
             );
@@ -158,7 +165,7 @@ class Degree_Importer {
         if( isset( $retval->programs ) ) {
             return $retval->programs;
         } else {
-            throw new Degree_Importer_Expcetion(
+            throw new Degree_Importer_Exception(
                 'No programs found in the undergraduate catalog api. ',
                 6
             );
@@ -212,6 +219,8 @@ class Degree_Importer {
         }
 
         if ( $created ) {
+            // Force a purge of any cached hierarchy so that parent/child relationships are
+            // properly saved: http://wordpress.stackexchange.com/a/8921
             delete_option('program_types_children');
             WP_CLI::log( 'Generated default program types.' );
         } else {
@@ -409,6 +418,11 @@ class Degree_Importer {
 
         if ( $this->catalog_programs ) {
             foreach( $this->catalog_programs as $key => $uc_program ) {
+                /**
+                 * Check if our program type string is a substring of the catalog's program type;
+                 * if both program names match, or the program is accelerated and the name is a substring of the catalog's program name or name + type;
+                 * and if the college name either matches or if one college name is a substring of the other
+                 **/
                 $uc_clean_program_name = $this->clean_name( $uc_program->name );
                 $uc_clean_type_name = $this->clean_name( $uc_program->type );
                 $uc_clean_college_name = $this->clean_name( $uc_program->college );
@@ -453,7 +467,7 @@ class Degree_Importer {
             'post_data' => array(
                 'post_title'  => $program->name,
                 'post_name'   => sanitize_title( $program->name . $program->suffix ),
-                'post_status' => $this->post_status,
+                'post_status' => 'draft',
                 'post_date'   => date( 'Y-m-d H:i:s' ),
                 'post_author' => 1,
                 'post_type'   => 'degree',
@@ -524,8 +538,8 @@ class Degree_Importer {
             $post_data['ID'] = $post_id;
             $post_data['post_status'] = $existing_post->post_status;
 
-			// Remove the post name so we're not updating permalinks
-			unset( $post_data['post_name'] );
+            // Remove the post name so we're not updating permalinks
+            unset( $post_data['post_name'] );
 
             // Remove the post date so publish date stays the same.
             unset( $post_data['post_date'] );
@@ -590,6 +604,30 @@ class Degree_Importer {
                     wp_delete_object_term_relationships( $post_id, $tax );
                 }
             }
+        }
+    }
+
+    /**
+     * Remove any degrees left from the existing_degree
+     * array once all other processing is finished.
+     * @author Jim Barnes
+     * @since 1.0.0
+     **/
+    private function remove_remaining_existing() {
+        foreach( $this->existing_posts as $post_id ) {
+            wp_delete_post( $post_id, true );
+            $removed_count++;
+        }
+    }
+
+    /**
+     * Publish any new degrees we're inserting.
+     * @author Jim Barnes
+     * @since 1.0.0
+     **/
+    private function publish_new_degrees() {
+        foreach( $this->new_posts as $post_id ) {
+            wp_publish_post( $post_id );
         }
     }
 }

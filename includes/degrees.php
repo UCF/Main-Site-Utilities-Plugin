@@ -107,11 +107,11 @@ class Degrees extends WP_CLI_Command {
      * @when after_wp_load
      */
     public function import( $args, $assoc_args ) {
-        $search_url = $args[0];
+        $search_url  = $args[0];
         $catalog_url = $args[1];
-        $post_status = $assoc_args['publish'] ? 'publish' : 'draft';
+        $publish     = $assoc_args['publish'] ? true : false;
 
-        $import = new Degree_Importer( $search_url, $catalog_url, $post_status );
+        $import = new Degree_Importer( $search_url, $catalog_url, $publish );
 
         try {
             $import->import();
