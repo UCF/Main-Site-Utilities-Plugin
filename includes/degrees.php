@@ -39,6 +39,8 @@ class Degrees extends WP_CLI_Command {
      * @when after_wp_load
      */
     public function reset( $args ) {
+		WP_CLI::confirm("This will delete all degrees, colleges, program_types and departments. Would you like to proceed?");
+
         $degree_count = 0;
 
         $query_args = array(

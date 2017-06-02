@@ -498,13 +498,14 @@ class Degree_Importer {
      * @param $degree_id int | The degree id
      * @return int | The post id
      **/
-    private function process_post( $post_data, $degree_id, $degree_type_id=null, $program_types ) {
+    private function process_post( $post_data, $degree_id, $degree_type_id=null, $program_types=null ) {
         $retval = null;
 
         // Attempt to fetch an existing post
         $args = array(
             'post_type'      => $post_data['post_type'],
             'posts_per_page' => 1,
+			'post_status'    => array( 'publish', 'draft' ),
             'meta_query'     => array(
                 array(
                     'key'   => 'degree_id',
