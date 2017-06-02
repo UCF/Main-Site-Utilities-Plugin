@@ -7,12 +7,15 @@ class Degree_Importer {
 		$search_api, // The url of the search api
 		$catalog_api, // The url of the undergraduate catalog api
 		$search_results, // The search results
+		$result_count,
 		$catalog_programs, // The undergaduate catalog results
 		$existing_posts, // Array to hold existing posts
 		$existing_count = 0, // Counter to count existing posts
 		$new_posts, // Array to hold new posts
 		$new_count = 0, // Counter to count new posts
 		$removed_count = 0, // Counter to count removed posts
+		$updated_posts,
+		$duplicate_count = 0,
 		$program_types = array(
 			'Undergraduate Program' => array(
 				'Undergraduate Degree',
@@ -40,6 +43,7 @@ class Degree_Importer {
 		$this->search_results = array();
 		$this->catalog_programs = array();
 		$this->existing_posts = array();
+		$this->updated_posts = array();
 		$this->new_posts = array();
 	}
 
@@ -70,6 +74,32 @@ class Degree_Importer {
 		catch (Exception $e) {
 			throw $e;
 		}
+	}
+
+	/**
+	 * Returns a message with current counts
+	 * @author Jim Barnes
+	 * @since 1.0.0
+	 * @return string | The success statistics
+	 **/
+	public function get_stats() {
+		$degree_total = $this->new_count + $this->existing_count - $this->removed_count;
+
+		return
+"
+
+Finished importing degrees.
+
+Total Processed : {$this->result_count}
+
+New             : {$this->new_count}
+Updated         : {$this->existing_count}
+Removed         : {$this->removed_count}
+Duplicates      : {$this->duplicate_count}
+
+Degree Total    : {$degree_total}
+
+";
 	}
 
 	/**
@@ -120,6 +150,7 @@ class Degree_Importer {
 				3
 			);
 		} else {
+			$this->result_count = count( $retval->results );
 			return $retval->results;
 		}
 	}
@@ -553,7 +584,14 @@ class Degree_Importer {
 
 			// Remove the post from the existing array
 			unset( $this->existing_posts[$post_data['ID']] );
-			$this->existing_count++;
+
+			// Added to ensure we have an accurated updated count
+			if ( ! isset( $this->updated_posts[$post_data['ID']] ) ) {
+				$this->updated_posts[$post_data['ID']] = $post_data['ID'];
+				$this->existing_count++;
+			} else {
+				$this->duplicate_count++;
+			}
 		} else {
 			$retval = wp_insert_post( $post_data );
 			$this->new_posts[] = $retval;
@@ -621,7 +659,7 @@ class Degree_Importer {
 	private function remove_remaining_existing() {
 		foreach( $this->existing_posts as $post_id ) {
 			wp_delete_post( $post_id, true );
-			$removed_count++;
+			$this->removed_count++;
 		}
 	}
 

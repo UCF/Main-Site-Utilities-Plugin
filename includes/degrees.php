@@ -1,6 +1,6 @@
 <?php
 /**
- * Commands for converting degrees
+ * Commands for creating and updating degrees
  */
 class Degrees extends WP_CLI_Command {
 	/**
@@ -118,6 +118,8 @@ class Degrees extends WP_CLI_Command {
 		catch( Exception $e ) {
 			WP_CLI::error( $e->getMessage(), $e->getCode() );
 		}
+
+		WP_CLI::success( $import->get_stats() );
 	}
 
 	/**
