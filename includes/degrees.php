@@ -97,8 +97,6 @@ class Degrees extends WP_CLI_Command {
      * <catalog_url>
      * : The url of the undergraduate catalog. (Required)
      * 
-     * [--publish]
-     * : Publishes all the new degrees.
      * ## EXAMPLES
      * 
      * # Imports degrees from the dev search service.
@@ -109,9 +107,8 @@ class Degrees extends WP_CLI_Command {
     public function import( $args, $assoc_args ) {
         $search_url  = $args[0];
         $catalog_url = $args[1];
-        $publish     = $assoc_args['publish'] ? true : false;
 
-        $import = new Degree_Importer( $search_url, $catalog_url, $publish );
+        $import = new Degree_Importer( $search_url, $catalog_url );
 
         try {
             $import->import();

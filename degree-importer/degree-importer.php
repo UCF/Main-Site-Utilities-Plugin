@@ -12,8 +12,7 @@ class Degree_Importer {
         $existing_count = 0, // Counter to count existing posts
         $new_posts, // Array to hold new posts
         $new_count = 0, // Counter to count new posts
-        $removed_count = 0,
-        $publish,
+        $removed_count = 0, // Counter to count removed posts
         $program_types = array(
             'Undergraduate Program' => array(
                 'Undergraduate Degree',
@@ -35,14 +34,13 @@ class Degree_Importer {
      * @param $catalog_url string | The url to the undergraduate catalog
      * @return DegreeImporter
      **/
-    public function __construct( $search_url, $catalog_url, $publish=false ) {
+    public function __construct( $search_url, $catalog_url ) {
         $this->search_api = $search_url;
         $this->catalog_api = $catalog_url;
         $this->search_results = array();
         $this->catalog_programs = array();
         $this->existing_posts = array();
         $this->new_posts = array();
-        $this->publish = $publish;
     }
 
     /**
@@ -63,10 +61,8 @@ class Degree_Importer {
             $this->process_degrees();
             // Remove degrees that are no longer in the search service.
             $this->remove_remaining_existing();
-            // If we're publishing new, publish them now
-            if ( $this->publish ) {
-				$this->publish_new_degrees();
-            }
+            // Publish new degrees now
+			$this->publish_new_degrees();
         }
         catch (Degree_Importer_Exception $die) {
             throw $die;
@@ -268,8 +264,9 @@ class Degree_Importer {
 
             $degree_id = isset( $post_meta['degree_id'] ) ? $post_meta['degree_id'] : null;
             $degree_type_id = isset( $post_meta['degree_type_id'] ) ? $post_meta['degree_type_id'] : null;
+			$program_types = isset( $post_meta['program_types'] ) ? $post_meta['program_types'] : null;
 
-            $post_id = $this->process_post( $post_data, $degree_id, $degree_type_id );
+            $post_id = $this->process_post( $post_data, $degree_id, $degree_type_id, $program_types );
             $this->process_post_meta( $post_id, $post_meta );
             $this->process_post_terms( $post_id, $post_terms );
 
@@ -501,7 +498,7 @@ class Degree_Importer {
      * @param $degree_id int | The degree id
      * @return int | The post id
      **/
-    private function process_post( $post_data, $degree_id, $degree_type_id=null ) {
+    private function process_post( $post_data, $degree_id, $degree_type_id=null, $program_types ) {
         $retval = null;
 
         // Attempt to fetch an existing post
@@ -518,7 +515,7 @@ class Degree_Importer {
                 array(
                     'taxonomy' => 'program_types',
                     'field'    => 'slug',
-                    'terms'    => sanitize_title( $post_terms['program_types'] )
+                    'terms'    => sanitize_title( $program_types )
                 )
             )
         );
