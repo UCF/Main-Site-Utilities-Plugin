@@ -66,7 +66,7 @@ class Tuition_Fees_Importer {
 	 * @return string
 	 **/
 	public function get_stats() {
-		$success_percetnage = round( $this->updated_total / $this->degree_count * 100 );
+		$success_percentage = round( $this->updated_total / $this->degree_count * 100 );
 
 		return
 "
@@ -77,7 +77,7 @@ Updated    : {$this->updated_total}
 Exceptions : {$this->mapped_total}
 Skipped    : {$this->skipped_total}
 
-Success %  : {$success_percetnage}%
+Success %  : {$success_percentage}%
 
 ";
 	}
@@ -110,7 +110,7 @@ Success %  : {$success_percetnage}%
 
 			if ( ! $schedules ) {
 				throw new Exception(
-					'Unabled to retrieve fee schedules',
+					'Unable to retrieve fee schedules',
 					2
 				);
 			}

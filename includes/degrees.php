@@ -132,7 +132,7 @@ class Degrees extends WP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 * # Imports degrees from the dev search service.
+	 * # Imports tuition for main site degrees.
 	 * $ wp mainsite degrees tuition http://www.studentaccounts.ucf.edu/feed/feed.cfm
 	 *
 	 * @when after_wp_load
