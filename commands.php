@@ -14,6 +14,7 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once 'importers/degree-importer.php';
 	require_once 'importers/degree-importer-exceptions.php';
 	require_once 'importers/tuition-fees-importer.php';
+	require_once 'importers/colleges-importer.php';
 
 	require_once 'includes/degrees.php';
 

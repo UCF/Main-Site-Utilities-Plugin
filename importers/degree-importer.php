@@ -35,7 +35,7 @@ class Degree_Importer {
 	 * @since 1.0.0
 	 * @param $search_url string | The url to the search service
 	 * @param $catalog_url string | The url to the undergraduate catalog
-	 * @return DegreeImporter
+	 * @return Degree_Importer
 	 **/
 	public function __construct( $search_url, $catalog_url ) {
 		$this->search_api = $search_url;
@@ -48,7 +48,7 @@ class Degree_Importer {
 	}
 
 	/**
-	 * Imports the degres into WordPress
+	 * Imports the degrees into WordPress
 	 * @author Jim Barnes
 	 * @since 1.0.0
 	 **/

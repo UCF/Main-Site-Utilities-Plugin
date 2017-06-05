@@ -153,6 +153,36 @@ class Degrees extends WP_CLI_Command {
 	}
 
 	/**
+	 * Updates colleges with meta data from search service.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <search_url>
+	 * : The url of the search service. (Required)
+	 *
+	 * ## EXAMPLES
+	 *
+	 * # Updates meta data from the UCF Search service
+	 * $ wp mainsite degrees colleges https://search.smca.ucf.edu/service.php
+	 *
+	 * @when after_wp_load
+	 */
+	public function colleges( $args, $assoc_args ) {
+		$search_url = $args[0];
+
+		$import = new Colleges_Importer( $search_url );
+
+		try {
+			$import->import();
+		}
+		catch( Exception $e ) {
+			WP_CLI::error( $e->getMessage(), $e->getCode() );
+		}
+
+		WP_CLI::success( $import->get_stats() );
+	}
+
+	/**
 	 * Converts post meta to the v3 format
 	 **/
 	private function convert_post_meta( $post ) {
