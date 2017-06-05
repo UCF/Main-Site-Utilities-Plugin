@@ -35,12 +35,21 @@ All degree commands are stored under the `degrees` command. To see avilable opti
 
 Import: `wp mainsite degrees import <search_url> <catalog_url> [--publish]`
 
+Imports degrees into the main site.
+
 - <search_url>
     - The url of the search service. (Required)
 - <catalog_url>
     - The url of the undergraduate catalog api. (Required)
 - [--publish]
     - Flag that publishes all new degrees. (Optional)
+
+Tuition and Fees: `wp mainsite degrees tuition <api>`
+
+Adds tuition and fee information to main site degrees.
+
+- <api>
+    - The url of the tuition feed
 
 Imports degrees from various sources and writes them into degree custom post types.
 
