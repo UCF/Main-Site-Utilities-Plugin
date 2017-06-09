@@ -24,10 +24,18 @@ class Degree_Importer {
 				'Accelerated Program'
 			),
 			'Graduate Program' => array(
-				'Graduate Degree',
+				'Master',
+				'Doctoral',
 				'Certificate'
 			)
-		); // Array of default program_types
+		), // Array of default program_types
+		$doctoral_mapping = array(
+			'DPT',
+			'DNP',
+			'EdD',
+			'PhD',
+			'MD'
+		);
 
 	/**
 	 * Constructor
@@ -268,7 +276,7 @@ Degree Total    : {$degree_total}
 		 **/
 		foreach( $this->search_results as $program ) {
 			$program->suffix = $this->get_program_suffix( $program->name, $program->type, $program->graduate );
-			$program->type = $this->get_program_type( $program->type, $program->graduate );
+			$program->type = $this->get_program_type( $program->type, $program->graduate, $program->name );
 			$program->type_ucmatch = $this->get_uc_program_type( $program->type );
 			$program->college_name = $this->get_college_name( $program->college_name );
 			$program->contacts = $this->format_contacts( $program->contacts );
@@ -327,15 +335,25 @@ Degree Total    : {$degree_total}
 	 * @since 1.0.0
 	 * @param $type string | The type from the search service
 	 * @param $graduate int | The graduate value from the search service
+	 * @param $name string | The program name
 	 * @return string | The newly formatted type
 	 **/
-	private function get_program_type( $type, $graduate ) {
+	private function get_program_type( $type, $graduate, $name ) {
 		switch( $type ) {
 			case 'major':
 				if ( $graduate === 0 ) {
 					$type = 'Undergraduate Degree';
 				} else {
-					$type = 'Graduate Degree';
+					foreach( $this->doctoral_mapping as $dm ) {
+						if ( stripos( $name, $dm ) !== false ) {
+							$type = 'Doctorate';
+							break;
+						}
+					}
+					if ( $type !== 'Doctorate' ) {
+						$type = 'Master';
+					}
+					break;
 				}
 				break;
 			case 'articulated':
@@ -408,6 +426,24 @@ Degree Total    : {$degree_total}
 		}
 
 		return $college_name;
+	}
+
+	/**
+	 * Generates the college slug
+	 * @author Jim Barnes
+	 * @since 1.0.0
+	 * @param $name string | The college name
+	 * @return string | The college slug
+	 **/
+	private function get_college_slug( $name ) {
+		// Remove "College of"
+		$retval = str_replace( 'college of', '', strtolower($name) );
+		// Remove "Rosen"
+		$retval = str_replace( 'rosen', '', $retval );
+		// Remove whitespace
+		$retval = trim( $retval );
+
+		return $retval;
 	}
 
 	/**
@@ -587,13 +623,18 @@ Degree Total    : {$degree_total}
 			// Added to ensure we have an accurated updated count
 			if ( ! isset( $this->updated_posts[$post_data['ID']] ) ) {
 				$this->updated_posts[$post_data['ID']] = $post_data['ID'];
-				$this->existing_count++;
+				// This is a duplicate if it's in the new posts array
+				if ( isset( $this->new_posts[$retval] ) ) {
+					$this->duplicate_count++;
+				} else {
+					$this->existing_count++;
+				}
 			} else {
 				$this->duplicate_count++;
 			}
 		} else {
 			$retval = wp_insert_post( $post_data );
-			$this->new_posts[] = $retval;
+			$this->new_posts[$retval] = $retval;
 
 			$this->new_count++;
 		}
@@ -633,7 +674,13 @@ Degree Total    : {$degree_total}
 				if ( ! empty( $existing_term ) && is_array( $existing_term ) ) {
 					$term_id = $existing_term['term_id'];
 				} else {
-					$new_term = wp_insert_term( $term, $tax );
+					$args = array();
+
+					if ( $tax === 'colleges' ) {
+						$args['slug'] = $this->get_college_slug( $term );
+					}
+
+					$new_term = wp_insert_term( $term, $tax, $args );
 
 					if ( gettype( $new_term ) === 'array' ) {
 						$term_id = $new_term['term_id'];
