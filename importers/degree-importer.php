@@ -436,10 +436,14 @@ Degree Total    : {$degree_total}
 	 * @return string | The college slug
 	 **/
 	private function get_college_slug( $name ) {
+		return sanitize_title( $this->get_college_alias( $name ) );
+	}
+
+	private function get_college_alias( $name ) {
 		// Remove "College of"
-		$retval = str_replace( 'college of', '', strtolower($name) );
+		$retval = str_replace( 'College of', '', $name );
 		// Remove "Rosen"
-		$retval = str_replace( 'rosen', '', $retval );
+		$retval = str_replace( 'Rosen', '', $retval );
 		// Remove whitespace
 		$retval = trim( $retval );
 
@@ -688,6 +692,10 @@ Degree Total    : {$degree_total}
 				}
 
 				if ( $term_id ) {
+					// Set the alias
+					$alias = $this->get_college_alias( $term );
+					update_term_meta( $term_id, 'colleges_alias', $alias );
+
 					wp_set_post_terms( $post_id, $term_id, $tax, true );
 				} else {
 					wp_delete_object_term_relationships( $post_id, $tax );
