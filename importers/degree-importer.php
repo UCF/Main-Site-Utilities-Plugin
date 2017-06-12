@@ -694,9 +694,7 @@ Degree Total    : {$degree_total}
 				if ( $term_id ) {
 					// Set the alias
 					$alias = $this->get_college_alias( $term );
-					if ( ! add_term_meta( $term_id, 'colleges_alias', $alias, true ) ) {
-						update_term_meta( $term_id, 'colleges_alias', $alias, true );
-					}
+					update_term_meta( $term_id, 'colleges_alias', $alias );
 
 					wp_set_post_terms( $post_id, $term_id, $tax, true );
 				} else {
