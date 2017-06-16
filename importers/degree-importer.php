@@ -25,7 +25,7 @@ class Degree_Importer {
 			),
 			'Graduate Program' => array(
 				'Master',
-				'Doctoral',
+				'Doctorate',
 				'Certificate'
 			)
 		), // Array of default program_types
