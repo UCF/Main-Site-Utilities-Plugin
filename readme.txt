@@ -3,7 +3,7 @@ Contributors: ucfwebcom
 Tags: ucf, wp cli, wp, cli
 Requires at least: 4.7.5
 Tested up to: 4.7.5
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/copyleft/gpl-3.0.html
 
@@ -55,6 +55,13 @@ Imports degrees from various sources and writes them into degree custom post typ
 
 
 == Changelog ==
+
+= 1.0.1 =
+Enhancements:
+* Added converter/importer for azindex links.
+
+Bug Fixes:
+* Updated name of `Doctoral` program type to `Doctorate` to match the logic used during the import.
 
 = 1.0.0 =
 * Initial release

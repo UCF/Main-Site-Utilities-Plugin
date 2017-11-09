@@ -49,6 +49,13 @@ Imports degrees from various sources and writes them into degree custom post typ
 
 ## Changelog ##
 
+### 1.0.1 ###
+Enhancements:
+* Added converter/importer for azindex links.
+
+Bug Fixes:
+* Updated name of `Doctoral` program type to `Doctorate` to match the logic used during the import.
+
 ### 1.0.0 ###
 * Initial release
 
