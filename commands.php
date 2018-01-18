@@ -10,16 +10,17 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
-	// Pull in the degree importer files.
-	require_once 'importers/degree-importer.php';
-	require_once 'importers/degree-importer-exceptions.php';
+	// Importer files
 	require_once 'importers/tuition-fees-importer.php';
 
+	// Converter files
 	require_once 'converters/resource-converter.php';
 
+	// Command files
 	require_once 'includes/degrees.php';
 	require_once 'includes/converters.php';
 
+	// Add new commands
 	WP_CLI::add_command( 'mainsite degrees', 'Degrees' );
 	WP_CLI::add_command( 'mainsite converters', 'Converters' );
 
