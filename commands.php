@@ -13,9 +13,6 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	// Importer files
 	require_once 'importers/tuition-fees-importer.php';
 
-	// Import override files
-	require_once 'includes/degree-import-overrides.php';
-
 	// Converter files
 	require_once 'converters/resource-converter.php';
 
