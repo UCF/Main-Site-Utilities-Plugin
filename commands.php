@@ -9,7 +9,10 @@ if ( ! defined( 'WPINC' ) ) {
     die;
 }
 
+define( 'UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
+<<<<<<< Updated upstream
 	// Importer files
 	require_once 'importers/tuition-fees-importer.php';
 
@@ -23,7 +26,13 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	// Add new commands
 	WP_CLI::add_command( 'mainsite degrees', 'Degrees' );
 	WP_CLI::add_command( 'mainsite converters', 'Converters' );
+=======
+	// Pull in the degree importer files.
+	require_once UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR . 'importers/research-importer.php';
+	require_once UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR . 'includes/commands.php';
+>>>>>>> Stashed changes
 
+	WP_CLI::add_command( 'research', 'UCF\MainSiteUtilities\Commands\ResearchCommands' );
 }
 
 ?>
