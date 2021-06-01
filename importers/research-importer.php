@@ -72,7 +72,7 @@ Skipped  : {$this->researchers_skipped}
 			$result        = false;
 
 			if ( is_array( $response ) && is_int( $response_code ) && $response_code < 400 ) {
-				$result = json_decode( wp_remote_retrieve_body( $response ) );
+				$result = json_decode( \wp_remote_retrieve_body( $response ) );
 			}
 
 			return $result;
