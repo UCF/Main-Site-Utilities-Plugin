@@ -7,11 +7,33 @@ namespace UCF\MainSiteUtilities\Commands {
 	use UCF\MainSiteUtilities\Importers;
 
 	class ResearchCommands extends \WP_CLI_Command {
-		public function import( $args, $assoc_args ) {
-			$search_url = $assoc_args['search-service-url'] ?? null;
-			$params = $assoc_args['additional-params'] ?? null;
 
-			$importer = new Importers\ResearchImporter( $search_url, $params );
+		/**
+		 * Imports research from the UCF Search Service
+		 *
+		 * ## OPTIONS
+		 *
+		 * <search_url>
+		 * : The URL of the UCF Search Service
+		 *
+		 * [--params=<params>]
+		 * : Additional URL parameters to pass to the Search Service
+		 *
+		 * [--force-template=<bool>]
+		 * : Whether or not to force update the WordPress template
+		 *
+		 * ## EXAMPLES
+		 *
+		 *     wp research import http://127.0.0.1:8000/api/v1/ --force-template=True
+		 *
+		 * @when after_wp_load
+		 */
+		public function import( $args, $assoc_args ) {
+			list( $search_url ) = $args;
+			$params = $assoc_args['additional-params'] ?? null;
+			$force_template = filter_var( $assoc_args['force-template'] ?? false, FILTER_VALIDATE_BOOLEAN );
+
+			$importer = new Importers\ResearchImporter( $search_url, $params, $force_template );
 
 			try {
 				$importer->import();
