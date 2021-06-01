@@ -21,10 +21,12 @@ namespace UCF\MainSiteUtilities\Importers {
 		 * @since 2.0.0
 		 * @param string $search_service_url The base url of the search service
 		 * @param array $params Additional parameters to pass to the search service
+		 * @param bool $force_template Forces the template value to be updated.
 		 */
-		public function __construct( $search_service_url, $params ) {
+		public function __construct( $search_service_url, $params, $force_template=false ) {
 			$this->api_url = \trailingslashit( $search_service_url );
 			$this->params = $params;
+			$this->force_template = $force_template;
 			$this->researchers = array();
 		}
 
@@ -98,11 +100,11 @@ Skipped  : {$this->researchers_skipped}
 				$response = $this->fetch_json( $next_url );
 
 				if ( ! $response || ! isset( $response->results ) ) {
-					throw new Exception( 'Failed to parse the Search Service JSON.' );
+					throw new \Exception( 'Failed to parse the Search Service JSON.' );
 				}
 
 				if ( count( $response->results ) === 0 ) {
-					throw new Exception( 'No results found.' );
+					throw new \Exception( 'No results found.' );
 				}
 
 				$next_url = $response->next ?? false;
@@ -145,11 +147,11 @@ Skipped  : {$this->researchers_skipped}
 					$post_id                  = $existing->ID;
 					$post_data['post_status'] = $existing->post_status;
 
-					wp_update_post( $post_data );
+					\wp_update_post( $post_data );
 
 					$this->researchers_updated++;
 				} else {
-					$post_id = wp_insert_post( $post_data );
+					$post_id = \wp_insert_post( $post_data );
 					$this->researchers_created ++;
 				}
 
@@ -196,11 +198,15 @@ Skipped  : {$this->researchers_skipped}
 					'person_degrees'    => $educational_info,
 					'person_books'      => $books,
 					'person_articles'   => $articles,
-					'_wp_page_template' => 'template-faculty.php',
+					'person_type'       => 'faculty',
 				);
 
+				if ( ! $existing || $this->force_template ) {
+					$post_meta['_wp_page_template'] = 'template-faculty.php';
+				}
+
 				foreach( $post_meta as $key => $val ) {
-					update_field( $key, $val, $post_id );
+					\update_field( $key, $val, $post_id );
 				}
 			}
 		}
