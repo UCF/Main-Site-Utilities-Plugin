@@ -162,10 +162,10 @@ Skipped  : {$this->researchers_skipped}
 				foreach( $researcher->education as $edu ) {
 					$educational_info[] = array(
 						'institution_name' => $edu->institution_name,
-						'role_name'       => $edu->role_name,
-						'start_date'      => $edu->start_date,
-						'end_date'        => $edu->end_date,
-						'department_date' => $edu->department_name
+						'role_name'        => $edu->role_name,
+						'start_date'       => $edu->start_date,
+						'end_date'         => $edu->end_date,
+						'department_date'  => $edu->department_name
 					);
 				}
 
