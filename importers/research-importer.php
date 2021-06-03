@@ -13,7 +13,11 @@ namespace UCF\MainSiteUtilities\Importers {
 			$researchers_processed = 0,
 			$researchers_created   = 0,
 			$researchers_updated   = 0,
-			$researchers_skipped   = 0;
+			$researchers_skipped   = 0,
+			$researchers_deleted   = 0,
+
+			// Let's hold onto these
+			$post_ids_processed    = [];
 
 		/**
 		 * Constructor
@@ -38,6 +42,7 @@ namespace UCF\MainSiteUtilities\Importers {
 		public function import() {
 			$this->get_researchers();
 			$this->import_researchers();
+			$this->delete_stale_records();
 		}
 
 		/**
@@ -56,6 +61,7 @@ Processed: {$this->researchers_processed}
 Created  : {$this->researchers_created}
 Updated  : {$this->researchers_updated}
 Skipped  : {$this->researchers_skipped}
+Deleted  : {$this->researchers_deleted}
 
 			";
 		}
@@ -125,7 +131,7 @@ Skipped  : {$this->researchers_skipped}
 				$this->researchers_processed++;
 
 				# No research? SKIP!
-				if ( $researcher->works_count === 0 ) {
+				if ( $researcher->featured_works_count === 0 ) {
 					$this->researchers_skipped++;
 					continue;
 				}
@@ -154,6 +160,8 @@ Skipped  : {$this->researchers_skipped}
 					$post_id = \wp_insert_post( $post_data );
 					$this->researchers_created ++;
 				}
+
+				$this->post_ids_processed[] = $post_id;
 
 				// Update the post meta
 				$educational_info = array();
@@ -207,6 +215,30 @@ Skipped  : {$this->researchers_skipped}
 
 				foreach( $post_meta as $key => $val ) {
 					\update_field( $key, $val, $post_id );
+				}
+			}
+		}
+
+		/**
+		 * Gets all posts that were not processed
+		 * and removed them.
+		 * @author Jim Barnes
+		 * @since 2.0.0
+		 */
+		private function delete_stale_records() {
+			$args = array(
+				'post_type'      => 'person',
+				'post__not_in'   => $this->post_ids_processed,
+				'posts_per_page' => -1
+			);
+
+			$stale_posts = get_posts( $args );
+
+			foreach( $stale_posts as $post ) {
+				$post = wp_delete_post( $post->ID, true );
+
+				if ( $post ) {
+					$this->researchers_deleted++;
 				}
 			}
 		}
