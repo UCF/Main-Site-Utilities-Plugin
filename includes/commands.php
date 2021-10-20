@@ -22,6 +22,9 @@ namespace UCF\MainSiteUtilities\Commands {
 		 * [--force-template=<bool>]
 		 * : Whether or not to force update the WordPress template
 		 *
+		 * [--force-update=<bool>]
+		 * : Whether or not all records will be deleted prior to import
+		 *
 		 * ## EXAMPLES
 		 *
 		 *     wp research import http://127.0.0.1:8000/api/v1/ --force-template=True
@@ -32,6 +35,7 @@ namespace UCF\MainSiteUtilities\Commands {
 			list( $search_url ) = $args;
 			$params = $assoc_args['additional-params'] ?? null;
 			$force_template = filter_var( $assoc_args['force-template'] ?? false, FILTER_VALIDATE_BOOLEAN );
+			$force_update = filter_var( $assoc_args['force-update'] ?? false, FILTER_VALIDATE_BOOLEAN );
 
 			$importer = new Importers\ResearchImporter( $search_url, $params, $force_template );
 

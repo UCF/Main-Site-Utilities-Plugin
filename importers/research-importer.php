@@ -26,11 +26,13 @@ namespace UCF\MainSiteUtilities\Importers {
 		 * @param string $search_service_url The base url of the search service
 		 * @param array $params Additional parameters to pass to the search service
 		 * @param bool $force_template Forces the template value to be updated.
+		 * @param bool $force_update Deletes all existing records before importing
 		 */
-		public function __construct( $search_service_url, $params, $force_template=false ) {
+		public function __construct( $search_service_url, $params, $force_template=false, $force_update=false ) {
 			$this->api_url = \trailingslashit( $search_service_url );
 			$this->params = $params;
 			$this->force_template = $force_template;
+			$this->force_update = $force_update;
 			$this->researchers = array();
 		}
 
@@ -40,6 +42,10 @@ namespace UCF\MainSiteUtilities\Importers {
 		 * @since 2.0.0
 		 */
 		public function import() {
+			if ($this->force_update) {
+				$this->delete_existing_researchers();
+			}
+
 			$this->get_researchers();
 			$this->import_researchers();
 			$this->delete_stale_records();
@@ -87,6 +93,26 @@ Deleted  : {$this->researchers_deleted}
 		}
 
 		/**
+		 * Deletes all existing researcher records
+		 * @author Jim Barnes
+		 * @since 2.0.0
+		 * @return void
+		 */
+		private function delete_existing_researchers() {
+			$researchers = get_posts( array(
+				'post_type'      => 'person',
+				'posts_per_page' => -1,
+				'meta_key'       => '_wp_page_template',
+				'meta_value'     => 'template-faculty.php'
+			) );
+
+			foreach( $researchers as $researcher ) {
+				wp_delete_post( $researcher->ID, true );
+				$this->researchers_deleted++;
+			}
+		}
+
+		/**
 		 * Gets all the researcher records from
 		 * the search service.
 		 * @author Jim Barnes
@@ -120,6 +146,20 @@ Deleted  : {$this->researchers_deleted}
 		}
 
 		/**
+		 * Helper function used by the array_map
+		 * when retrieving research citations
+		 * @author Jim Barnes
+		 * @since 2.0.0
+		 * @param object $obj The JSON object
+		 * @return string
+		 */
+		public function get_simple_citation_html( $obj ) {
+			return array(
+				'citation' => $obj->simple_citation_html
+			);
+		}
+
+		/**
 		 * Loops through the imported researchers
 		 * and pulls their information and research
 		 * @author Jim Barnes
@@ -130,13 +170,7 @@ Deleted  : {$this->researchers_deleted}
 			foreach( $this->researchers as $researcher ) {
 				$this->researchers_processed++;
 
-				# No research? SKIP!
-				if ( $researcher->featured_works_count === 0 ) {
-					$this->researchers_skipped++;
-					continue;
-				}
-
-				$existing = $this->get_researcher_record( $researcher->orcid_id );
+				$existing = $this->get_researcher_record( $researcher->teledata_record->employee_id );
 
 				$post_data = array(
 					'post_title'        => $researcher->name_formatted_title,
@@ -173,40 +207,45 @@ Deleted  : {$this->researchers_deleted}
 						'role_name'        => $edu->role_name,
 						'start_date'       => $edu->start_date,
 						'end_date'         => $edu->end_date,
-						'department_date'  => $edu->department_name
+						'department_name'  => $edu->department_name
 					);
 				}
 
-				$works = $this->fetch_json( $researcher->works );
+				$books_resp       = $this->fetch_json( $researcher->books );
+				$articles_resp    = $this->fetch_json( $researcher->articles );
+				$chapters_resp    = $this->fetch_json( $researcher->book_chapters );
+				$proceedings_resp = $this->fetch_json( $researcher->conference_proceedings );
+				$grants_resp      = $this->fetch_json( $researcher->grants );
+				$awards_resp      = $this->fetch_json( $researcher->honorific_awards );
+				$patents_resp     = $this->fetch_json( $researcher->patents );
+				$trials_resp      = $this->fetch_json( $researcher->clinical_trials );
 
-				$books    = array();
-				$articles = array();
-
-				foreach( $works->results as $work ) {
-					if ( ! empty( $work->citation ) ) {
-						if ( $work->work_type === 'BOOK' ) {
-							$books[] = array(
-								'book_citation' => $work->citation
-							);
-						} else if ( $work->work_type === 'JOURNAL_ARTICLE' ) {
-							$articles[] = array(
-								'article_citation' => $work->citation
-							);
-						}
-					}
-				}
+				$books       = array_map( array($this, 'get_simple_citation_html'), $books_resp->results );
+				$articles    = array_map( array($this, 'get_simple_citation_html'), $articles_resp->results );
+				$chapters    = array_map( array($this, 'get_simple_citation_html'), $chapters_resp->results );
+				$proceedings = array_map( array($this, 'get_simple_citation_html'), $proceedings_resp->results );
+				$grants      = array_map( array($this, 'get_simple_citation_html'), $grants_resp->results );
+				$awards      = array_map( array($this, 'get_simple_citation_html'), $awards_resp->results );
+				$patents     = array_map( array($this, 'get_simple_citation_html'), $patents_resp->results );
+				$trials      = array_map( array($this, 'get_simple_citation_html'), $trials_resp->results );
 
 				$post_meta = array(
-					'person_orcid_id'   => $researcher->orcid_id,
-					'person_title'      => $researcher->teledata_record->job_position,
-					'person_email'      => $researcher->teledata_record->email,
-					'person_phone'      => $researcher->teledata_record->phone,
-					'person_office'     => "{$researcher->teledata_record->bldg->abbr} {$researcher->teledata_record->room}",
-					'person_department' => $researcher->teledata_record->dept->name,
-					'person_degrees'    => $educational_info,
-					'person_books'      => $books,
-					'person_articles'   => $articles,
-					'person_type'       => 'faculty',
+					'person_employee_id' => $researcher->teledata_record->employee_id,
+					'person_title'       => $researcher->teledata_record->job_position,
+					'person_email'       => $researcher->teledata_record->email,
+					'person_phone'       => $researcher->teledata_record->phone,
+					'person_office'      => "{$researcher->teledata_record->bldg->abbr} {$researcher->teledata_record->room}",
+					'person_department'  => $researcher->teledata_record->dept->name,
+					'person_degrees'     => $educational_info,
+					'person_books'       => $books,
+					'person_articles'    => $articles,
+					'person_chapters'    => $chapters,
+					'person_proceedings' => $proceedings,
+					'person_grants'      => $grants,
+					'person_awards'      => $awards,
+					'person_patents'     => $patents,
+					'person_trials'      => $trials,
+					'person_type'        => 'faculty',
 				);
 
 				if ( ! $existing || $this->force_template ) {
@@ -251,10 +290,10 @@ Deleted  : {$this->researchers_deleted}
 		 * @param string $orcid_id
 		 * @return mixed WP_Post if found, false if not
 		 */
-		private function get_researcher_record( $orcid_id ) {
+		private function get_researcher_record( $empl_id ) {
 			$args = array(
-				'meta_key'       => 'person_orcid_id',
-				'meta_value'     => $orcid_id,
+				'meta_key'       => 'person_employee_id',
+				'meta_value'     => $empl_id,
 				'post_type'      => 'person',
 				'posts_per_page' => 1,
 			);
