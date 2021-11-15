@@ -33,11 +33,11 @@ namespace UCF\MainSiteUtilities\Commands {
 		 */
 		public function import( $args, $assoc_args ) {
 			list( $search_url ) = $args;
-			$params = $assoc_args['additional-params'] ?? null;
+			$params = $assoc_args['params'] ?? null;
 			$force_template = filter_var( $assoc_args['force-template'] ?? false, FILTER_VALIDATE_BOOLEAN );
 			$force_update = filter_var( $assoc_args['force-update'] ?? false, FILTER_VALIDATE_BOOLEAN );
 
-			$importer = new Importers\ResearchImporter( $search_url, $params, $force_template );
+			$importer = new Importers\ResearchImporter( $search_url, $params, $force_template, $force_update );
 
 			try {
 				$importer->import();
