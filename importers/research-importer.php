@@ -230,7 +230,8 @@ Deleted  : {$this->researchers_deleted}
 				$trials      = array_map( array($this, 'get_simple_citation_html'), $trials_resp->results );
 
 				$post_meta = array(
-					'person_employee_id' => $researcher->teledata_record->employee_id,
+					'person_employee_id' => $researcher->employee_record->ext_employee_id,
+					'person_last_name'   => $researcher->employee_record->last_name,
 					'person_title'       => $researcher->teledata_record->job_position,
 					'person_email'       => $researcher->teledata_record->email,
 					'person_phone'       => $researcher->teledata_record->phone,
