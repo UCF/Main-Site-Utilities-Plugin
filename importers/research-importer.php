@@ -170,7 +170,7 @@ Deleted  : {$this->researchers_deleted}
 			foreach( $this->researchers as $researcher ) {
 				$this->researchers_processed++;
 
-				$existing = $this->get_researcher_record( $researcher->teledata_record->employee_id );
+				$existing = $this->get_researcher_record( $researcher->employee_record->ext_employee_id );
 
 				$post_data = array(
 					'post_title'        => $researcher->name_formatted_title,
@@ -235,7 +235,6 @@ Deleted  : {$this->researchers_deleted}
 					'person_title'       => $researcher->teledata_record->job_position,
 					'person_email'       => $researcher->teledata_record->email,
 					'person_phone'       => $researcher->teledata_record->phone,
-					'person_office'      => "{$researcher->teledata_record->bldg->abbr} {$researcher->teledata_record->room}",
 					'person_department'  => $researcher->teledata_record->dept->name,
 					'person_degrees'     => $educational_info,
 					'person_books'       => $books,
