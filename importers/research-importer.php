@@ -287,9 +287,13 @@ Deleted  : {$this->researchers_deleted}
 				}
 
 				// Assign departments
-				wp_set_post_terms( $post_id, array( $this->get_or_create_taxonomy_terms( $researcher->employee_record->departments, 'departments' ) ), 'departments' );
+				if ( $departments = $researcher->employee_record->departments ) {
+					wp_set_post_terms( $post_id, array( $this->get_or_create_taxonomy_terms( $departments, 'departments' ) ), 'departments' );
+				}
 				// Assign colleges
-				wp_set_post_terms( $post_id, array( $this->get_or_create_taxonomy_terms( $researcher->employee_record->colleges, 'colleges' ) ), 'colleges' );
+				if ( $colleges = $researcher->employee_record->colleges ) {
+					wp_set_post_terms( $post_id, array( $this->get_or_create_taxonomy_terms( $colleges, 'colleges' ) ), 'colleges' );
+				}
 
 				foreach( $post_meta as $key => $val ) {
 					\update_field( $key, $val, $post_id );
