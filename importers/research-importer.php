@@ -160,6 +160,32 @@ Deleted  : {$this->researchers_deleted}
 		}
 
 		/**
+		 * Helper function used to return or create a
+		 * WP_Term object for the given taxonomy.
+		 * @author Cadie Stockman
+		 * @since 2.0.0
+		 * @param array $array The array
+		 * @param string $taxonomy_name The taxonomy name to create/assign terms to
+		 * @return string
+		 */
+		public function get_or_create_taxonomy_terms( $array, $taxonomy_name ) {
+			foreach( $array as $item ) {
+				$term_id = null;
+				$term_data = get_term_by( 'name', $item->name, $taxonomy_name, ARRAY_A );
+
+				if ( ! $term_data ) {
+					$term_data = wp_insert_term( $item->name, $taxonomy_name );
+				}
+
+				if ( isset( $term_data['term_id'] ) ) {
+					$term_id = $term_data['term_id'];
+				}
+
+				return $term_id;
+			}
+		}
+
+		/**
 		 * Loops through the imported researchers
 		 * and pulls their information and research
 		 * @author Jim Barnes
@@ -244,7 +270,6 @@ Deleted  : {$this->researchers_deleted}
 					'person_titles'      => $job_titles,
 					'person_email'       => $researcher->teledata_record->email,
 					'person_phone'       => $researcher->teledata_record->phone,
-					'person_department'  => $researcher->teledata_record->dept->name,
 					'person_degrees'     => $educational_info,
 					'person_books'       => $books,
 					'person_articles'    => $articles,
@@ -260,6 +285,11 @@ Deleted  : {$this->researchers_deleted}
 				if ( ! $existing || $this->force_template ) {
 					$post_meta['_wp_page_template'] = 'template-faculty.php';
 				}
+
+				// Assign departments
+				wp_set_post_terms( $post_id, array( $this->get_or_create_taxonomy_terms( $researcher->employee_record->departments, 'departments' ) ), 'departments' );
+				// Assign colleges
+				wp_set_post_terms( $post_id, array( $this->get_or_create_taxonomy_terms( $researcher->employee_record->colleges, 'colleges' ) ), 'colleges' );
 
 				foreach( $post_meta as $key => $val ) {
 					\update_field( $key, $val, $post_id );
