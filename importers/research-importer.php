@@ -160,6 +160,32 @@ Deleted  : {$this->researchers_deleted}
 		}
 
 		/**
+		 * Helper function used to return or create a
+		 * WP_Term object for the given taxonomy.
+		 * @author Cadie Stockman
+		 * @since 2.0.0
+		 * @param array $array The array
+		 * @param string $taxonomy_name The taxonomy name to create/assign terms to
+		 * @return string
+		 */
+		public function get_or_create_taxonomy_terms( $array, $taxonomy_name ) {
+			foreach( $array as $item ) {
+				$term_id = null;
+				$term_data = get_term_by( 'name', $item->name, $taxonomy_name, ARRAY_A );
+
+				if ( ! $term_data ) {
+					$term_data = wp_insert_term( $item->name, $taxonomy_name );
+				}
+
+				if ( isset( $term_data['term_id'] ) ) {
+					$term_id = $term_data['term_id'];
+				}
+
+				return $term_id;
+			}
+		}
+
+		/**
 		 * Loops through the imported researchers
 		 * and pulls their information and research
 		 * @author Jim Barnes
@@ -170,7 +196,7 @@ Deleted  : {$this->researchers_deleted}
 			foreach( $this->researchers as $researcher ) {
 				$this->researchers_processed++;
 
-				$existing = $this->get_researcher_record( $researcher->teledata_record->employee_id );
+				$existing = $this->get_researcher_record( $researcher->employee_record->ext_employee_id );
 
 				$post_data = array(
 					'post_title'        => $researcher->name_formatted_title,
@@ -196,6 +222,15 @@ Deleted  : {$this->researchers_deleted}
 				}
 
 				$this->post_ids_processed[] = $post_id;
+
+				// Capture all of the job titles
+				$job_titles = array();
+
+				foreach( $researcher->employee_record->job_titles as $job ) {
+					$job_titles[] = array(
+						'job_title' => $job->name
+					);
+				}
 
 				// Update the post meta
 				$educational_info = array();
@@ -230,12 +265,11 @@ Deleted  : {$this->researchers_deleted}
 				$trials      = array_map( array($this, 'get_simple_citation_html'), $trials_resp->results );
 
 				$post_meta = array(
-					'person_employee_id' => $researcher->teledata_record->employee_id,
-					'person_title'       => $researcher->teledata_record->job_position,
+					'person_employee_id' => $researcher->employee_record->ext_employee_id,
+					'person_last_name'   => $researcher->employee_record->last_name,
+					'person_titles'      => $job_titles,
 					'person_email'       => $researcher->teledata_record->email,
 					'person_phone'       => $researcher->teledata_record->phone,
-					'person_office'      => "{$researcher->teledata_record->bldg->abbr} {$researcher->teledata_record->room}",
-					'person_department'  => $researcher->teledata_record->dept->name,
 					'person_degrees'     => $educational_info,
 					'person_books'       => $books,
 					'person_articles'    => $articles,
@@ -250,6 +284,15 @@ Deleted  : {$this->researchers_deleted}
 
 				if ( ! $existing || $this->force_template ) {
 					$post_meta['_wp_page_template'] = 'template-faculty.php';
+				}
+
+				// Assign departments
+				if ( $departments = $researcher->employee_record->departments ) {
+					wp_set_post_terms( $post_id, array( $this->get_or_create_taxonomy_terms( $departments, 'departments' ) ), 'departments' );
+				}
+				// Assign colleges
+				if ( $colleges = $researcher->employee_record->colleges ) {
+					wp_set_post_terms( $post_id, array( $this->get_or_create_taxonomy_terms( $colleges, 'colleges' ) ), 'colleges' );
 				}
 
 				foreach( $post_meta as $key => $val ) {
