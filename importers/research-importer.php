@@ -170,18 +170,9 @@ Deleted  : {$this->researchers_deleted}
 		 */
 		public function get_or_create_taxonomy_terms( $array, $taxonomy_name ) {
 			foreach( $array as $item ) {
-				$term_id = null;
-				$term_data = get_term_by( 'name', $item->name, $taxonomy_name, ARRAY_A );
+				$term_data = wp_create_term( $item->name, $taxonomy_name );
 
-				if ( ! $term_data ) {
-					$term_data = wp_insert_term( $item->name, $taxonomy_name );
-				}
-
-				if ( isset( $term_data['term_id'] ) ) {
-					$term_id = $term_data['term_id'];
-				}
-
-				return $term_id;
+				return $term_data['term_id'];
 			}
 		}
 
