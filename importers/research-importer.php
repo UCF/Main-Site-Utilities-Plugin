@@ -197,6 +197,15 @@ Deleted  : {$this->researchers_deleted}
 
 				$this->post_ids_processed[] = $post_id;
 
+				// Capture all of the job titles
+				$job_titles = array();
+
+				foreach( $researcher->employee_record->job_titles as $job ) {
+					$job_titles[] = array(
+						'job_title' => $job->name
+					);
+				}
+
 				// Update the post meta
 				$educational_info = array();
 
@@ -232,7 +241,7 @@ Deleted  : {$this->researchers_deleted}
 				$post_meta = array(
 					'person_employee_id' => $researcher->employee_record->ext_employee_id,
 					'person_last_name'   => $researcher->employee_record->last_name,
-					'person_title'       => $researcher->teledata_record->job_position,
+					'person_titles'      => $job_titles,
 					'person_email'       => $researcher->teledata_record->email,
 					'person_phone'       => $researcher->teledata_record->phone,
 					'person_department'  => $researcher->teledata_record->dept->name,
