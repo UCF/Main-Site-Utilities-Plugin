@@ -27,6 +27,25 @@ Provides utilities (jobs) to run for the main website.
 
 == Commands ==
 
+=== Research Import ===
+
+```
+wp research import
+    <search_url>
+    [--params=<params>]
+    [--force-template=<bool>]
+    [--force-update=<bool>]
+```
+
+**Options**
+
+| Option | Type | Description | Default |
+|---|---|---|---|
+| `search_url` | `string` | The URL of the search service. | empty |
+| `--params` | `string` | An HTML encoded parameter string. Can be used to add additional filtering to the search service endpoint. | null |
+| `--force-template` | `bool` | If True, forces an update to the page template for each researcher imported. | false |
+| `--force-update` | `bool` | If True, removes all researchers prior to importing. | false |
+
 
 == Changelog ==
 
