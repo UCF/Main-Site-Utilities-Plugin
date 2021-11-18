@@ -102,8 +102,8 @@ Deleted  : {$this->researchers_deleted}
 			$researchers = get_posts( array(
 				'post_type'      => 'person',
 				'posts_per_page' => -1,
-				'meta_key'       => '_wp_page_template',
-				'meta_value'     => 'template-faculty.php'
+				'meta_key'       => 'person_type',
+				'meta_value'     => 'faculty'
 			) );
 
 			foreach( $researchers as $researcher ) {
@@ -302,7 +302,9 @@ Deleted  : {$this->researchers_deleted}
 			$args = array(
 				'post_type'      => 'person',
 				'post__not_in'   => $this->post_ids_processed,
-				'posts_per_page' => -1
+				'posts_per_page' => -1,
+				'meta_key'       => 'person_type',
+				'meta_value'     => 'faculty'
 			);
 
 			$stale_posts = get_posts( $args );
