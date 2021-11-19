@@ -102,8 +102,8 @@ Deleted  : {$this->researchers_deleted}
 			$researchers = get_posts( array(
 				'post_type'      => 'person',
 				'posts_per_page' => -1,
-				'meta_key'       => '_wp_page_template',
-				'meta_value'     => 'template-faculty.php'
+				'meta_key'       => 'person_type',
+				'meta_value'     => 'faculty'
 			) );
 
 			foreach( $researchers as $researcher ) {
@@ -259,8 +259,8 @@ Deleted  : {$this->researchers_deleted}
 					'person_employee_id' => $researcher->employee_record->ext_employee_id,
 					'person_last_name'   => $researcher->employee_record->last_name,
 					'person_titles'      => $job_titles,
-					'person_email'       => $researcher->teledata_record->email,
-					'person_phone'       => $researcher->teledata_record->phone,
+					'person_email'       => $researcher->teledata_record ? $researcher->teledata_record->email : null,
+					'person_phone'       => $researcher->teledata_record ? $researcher->teledata_record->email : null,
 					'person_degrees'     => $educational_info,
 					'person_books'       => $books,
 					'person_articles'    => $articles,
@@ -302,7 +302,9 @@ Deleted  : {$this->researchers_deleted}
 			$args = array(
 				'post_type'      => 'person',
 				'post__not_in'   => $this->post_ids_processed,
-				'posts_per_page' => -1
+				'posts_per_page' => -1,
+				'meta_key'       => 'person_type',
+				'meta_value'     => 'faculty'
 			);
 
 			$stale_posts = get_posts( $args );
