@@ -172,13 +172,7 @@ Deleted  : {$this->researchers_deleted}
 			$retval = array();
 
 			foreach( $array as $item ) {
-				if ( $taxonomy_name == 'post_tag' ){
-					$name = $item;
-				} else {
-					$name = $item->name;
-				}
-
-				$term_data = wp_create_term( $name, $taxonomy_name );
+				$term_data = wp_create_term( $item->name, $taxonomy_name );
 
 				$retval[] = intval( $term_data['term_id'] );
 			}
@@ -297,7 +291,7 @@ Deleted  : {$this->researchers_deleted}
 				}
 
 				if ( $terms = $researcher->research_terms ) {
-					wp_set_post_terms( $post_id, array( $this->get_or_create_taxonomy_terms( $terms, 'post_tag' ) ), 'post_tag' );
+					wp_set_post_terms( $post_id, $researcher->research_terms, 'post_tag' );
 				}
 
 				foreach( $post_meta as $key => $val ) {
