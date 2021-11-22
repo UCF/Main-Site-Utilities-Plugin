@@ -170,9 +170,15 @@ Deleted  : {$this->researchers_deleted}
 		 */
 		public function get_or_create_taxonomy_terms( $array, $taxonomy_name ) {
 			foreach( $array as $item ) {
-				$term_data = wp_create_term( $item->name, $taxonomy_name );
+				if ( $taxonomy_name == 'post_tag' ){
+					$name = $item;
+				} else {
+					$name = $item->name;
+				}
 
-				return $term_data['term_id'];
+				$term_data = wp_create_term( $name, $taxonomy_name );
+
+				return intval( $term_data['term_id'] );
 			}
 		}
 
@@ -284,6 +290,10 @@ Deleted  : {$this->researchers_deleted}
 				// Assign colleges
 				if ( $colleges = $researcher->employee_record->colleges ) {
 					wp_set_post_terms( $post_id, array( $this->get_or_create_taxonomy_terms( $colleges, 'colleges' ) ), 'colleges' );
+				}
+
+				if ( $terms = $researcher->research_terms ) {
+					wp_set_post_terms( $post_id, array( $this->get_or_create_taxonomy_terms( $terms, 'post_tag' ) ), 'post_tag' );
 				}
 
 				foreach( $post_meta as $key => $val ) {
