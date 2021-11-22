@@ -169,6 +169,8 @@ Deleted  : {$this->researchers_deleted}
 		 * @return string
 		 */
 		public function get_or_create_taxonomy_terms( $array, $taxonomy_name ) {
+			$retval = array();
+
 			foreach( $array as $item ) {
 				if ( $taxonomy_name == 'post_tag' ){
 					$name = $item;
@@ -178,8 +180,10 @@ Deleted  : {$this->researchers_deleted}
 
 				$term_data = wp_create_term( $name, $taxonomy_name );
 
-				return intval( $term_data['term_id'] );
+				$retval[] = intval( $term_data['term_id'] );
 			}
+
+			return $retval;
 		}
 
 		/**
