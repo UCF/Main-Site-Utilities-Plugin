@@ -172,13 +172,7 @@ Deleted  : {$this->researchers_deleted}
 			$retval = array();
 
 			foreach( $array as $item ) {
-				if ( $taxonomy_name == 'post_tag' ){
-					$name = $item;
-				} else {
-					$name = $item->name;
-				}
-
-				$term_data = wp_create_term( $name, $taxonomy_name );
+				$term_data = wp_create_term( $item->name, $taxonomy_name );
 
 				$retval[] = intval( $term_data['term_id'] );
 			}
