@@ -297,7 +297,7 @@ Deleted  : {$this->researchers_deleted}
 				}
 
 				if ( $terms = $researcher->research_terms ) {
-					wp_set_post_terms( $post_id, array( $this->get_or_create_taxonomy_terms( $terms, 'post_tag' ) ), 'post_tag' );
+					wp_set_post_terms( $post_id, $researcher->research_terms, 'post_tag' );
 				}
 
 				foreach( $post_meta as $key => $val ) {
