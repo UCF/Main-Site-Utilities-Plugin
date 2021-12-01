@@ -169,11 +169,14 @@ Deleted  : {$this->researchers_deleted}
 		 * @return string
 		 */
 		public function get_or_create_taxonomy_terms( $array, $taxonomy_name ) {
+			$retval = array();
+
 			foreach( $array as $item ) {
 				$term_data = wp_create_term( $item->name, $taxonomy_name );
-
-				return $term_data['term_id'];
+				$retval[] = intval( $term_data['term_id'] );
 			}
+
+			return $retval;
 		}
 
 		/**
@@ -279,11 +282,15 @@ Deleted  : {$this->researchers_deleted}
 
 				// Assign departments
 				if ( $departments = $researcher->employee_record->departments ) {
-					wp_set_post_terms( $post_id, array( $this->get_or_create_taxonomy_terms( $departments, 'departments' ) ), 'departments' );
+					wp_set_post_terms( $post_id, $this->get_or_create_taxonomy_terms( $departments, 'departments' ), 'departments' );
 				}
 				// Assign colleges
 				if ( $colleges = $researcher->employee_record->colleges ) {
-					wp_set_post_terms( $post_id, array( $this->get_or_create_taxonomy_terms( $colleges, 'colleges' ) ), 'colleges' );
+					wp_set_post_terms( $post_id, $this->get_or_create_taxonomy_terms( $colleges, 'colleges' ), 'colleges' );
+				}
+
+				if ( $terms = $researcher->research_terms ) {
+					wp_set_post_terms( $post_id, $researcher->research_terms, 'post_tag' );
 				}
 
 				foreach( $post_meta as $key => $val ) {
