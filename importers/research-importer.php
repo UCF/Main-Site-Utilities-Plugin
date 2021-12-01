@@ -173,7 +173,6 @@ Deleted  : {$this->researchers_deleted}
 
 			foreach( $array as $item ) {
 				$term_data = wp_create_term( $item->name, $taxonomy_name );
-
 				$retval[] = intval( $term_data['term_id'] );
 			}
 
@@ -283,11 +282,11 @@ Deleted  : {$this->researchers_deleted}
 
 				// Assign departments
 				if ( $departments = $researcher->employee_record->departments ) {
-					wp_set_post_terms( $post_id, array( $this->get_or_create_taxonomy_terms( $departments, 'departments' ) ), 'departments' );
+					wp_set_post_terms( $post_id, $this->get_or_create_taxonomy_terms( $departments, 'departments' ), 'departments' );
 				}
 				// Assign colleges
 				if ( $colleges = $researcher->employee_record->colleges ) {
-					wp_set_post_terms( $post_id, array( $this->get_or_create_taxonomy_terms( $colleges, 'colleges' ) ), 'colleges' );
+					wp_set_post_terms( $post_id, $this->get_or_create_taxonomy_terms( $colleges, 'colleges' ), 'colleges' );
 				}
 
 				if ( $terms = $researcher->research_terms ) {
