@@ -289,8 +289,12 @@ Deleted  : {$this->researchers_deleted}
 					wp_set_post_terms( $post_id, $this->get_or_create_taxonomy_terms( $colleges, 'colleges' ), 'colleges' );
 				}
 
+				// Assign tags. Omit tags that WP can't search by
 				if ( $terms = $researcher->research_terms ) {
-					wp_set_post_terms( $post_id, $researcher->research_terms, 'post_tag' );
+					$terms = array_filter( $terms, function( $t ) {
+						return mb_strlen( $t, 'UTF-8' ) > 1;
+					} );
+					wp_set_post_terms( $post_id, $terms, 'post_tag' );
 				}
 
 				foreach( $post_meta as $key => $val ) {
