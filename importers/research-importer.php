@@ -289,8 +289,8 @@ Deleted  : {$this->researchers_deleted}
 					wp_set_post_terms( $post_id, $this->get_or_create_taxonomy_terms( $colleges, 'colleges' ), 'colleges' );
 				}
 
-				if ( $terms = $researcher->research_terms ) {
-					wp_set_post_terms( $post_id, $researcher->research_terms, 'post_tag' );
+				if ( $terms = $researcher->research_terms_featured ) {
+					wp_set_post_terms( $post_id, $researcher->research_terms_featured, 'post_tag' );
 				}
 
 				foreach( $post_meta as $key => $val ) {
