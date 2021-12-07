@@ -58,7 +58,7 @@ namespace UCF\MainSiteUtilities\Commands {
 		 * [--post-meta-key=<post_meta>]
 		 * : The meta key to use to find email.
 		 *
-		 * [--base_url=<base_url>]
+		 * [--base-url=<base_url>]
 		 * : The WP-JSON base URL to use to retrieve thumbnails.
 		 *
 		 * [--force-update=<bool>]
@@ -75,13 +75,13 @@ namespace UCF\MainSiteUtilities\Commands {
 		 */
 		public function thumbnails( $args, $assoc_args ) {
 			list( $filepath ) = $args;
-			$base_url      = $assoc_args['base_url'] ?? null;
+			$base_url      = $assoc_args['base-url'] ?? null;
 			$post_meta_key = $assoc_args['post-meta-key'] ?? 'person_email';
 			$force_update  = filter_var( $assoc_args['force-update'] ?? false, FILTER_VALIDATE_BOOLEAN );
 			$cah_importer  = filter_var( $assoc_args['use-cah-importer'] ?? false, FILTER_VALIDATE_BOOLEAN );
 
 			if ( $cah_importer ) {
-				\WP_CLI::error( 'That importer has not been implemented yet.' );
+				$importer = new Importers\CSVThumbnailImporter( $filepath, $base_url, $force_update );
 			} else {
 				$importer = new Importers\WordPressThumbnailImporter( $filepath, $base_url, $post_meta_key, $force_update );
 			}
