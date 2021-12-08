@@ -123,7 +123,8 @@ namespace UCF\MainSiteUtilities\Importers {
 
 			if ( $media_data ) {
 				$retval = $media_data->source_url;
-				if ( strpos( $retval, strval( $this->base_url ) ) == -1 ) {
+
+				if ( strpos( $retval, strval( $this->base_url ) ) === false ) {
 					$retval = $this->base_url . $retval;
 				}
 
