@@ -69,7 +69,7 @@ namespace UCF\MainSiteUtilities\Commands {
 		 *
 		 * ## EXAMPLES
 		 *
-		 *     wp research media-import wp-export.csv
+		 *     wp research thumbnails wp-export.csv
 		 *
 		 * @when after_wp_load
 		 */
