@@ -46,5 +46,52 @@ namespace UCF\MainSiteUtilities\Commands {
 				\WP_CLI::error( $e->message );
 			}
 		}
+
+		/**
+		 * Imports thumbnails for matched researchers
+		 *
+		 * ## OPTIONS
+		 *
+		 * <filepath>
+		 * : The path to the WordPress XML file for special CSV for importing
+		 *
+		 * [--post-meta-key=<post_meta>]
+		 * : The meta key to use to find email.
+		 *
+		 * [--base-url=<base_url>]
+		 * : The WP-JSON base URL to use to retrieve thumbnails.
+		 *
+		 * [--force-update=<bool>]
+		 * : Determines if existing thumbnails will be deleted.
+		 *
+		 * [--use-cah-importer=<bool>]
+		 * : Whether or not to use the special CAH importer for their CSV file.
+		 *
+		 * ## EXAMPLES
+		 *
+		 *     wp research media-import wp-export.csv
+		 *
+		 * @when after_wp_load
+		 */
+		public function thumbnails( $args, $assoc_args ) {
+			list( $filepath ) = $args;
+			$base_url      = $assoc_args['base-url'] ?? null;
+			$post_meta_key = $assoc_args['post-meta-key'] ?? 'person_email';
+			$force_update  = filter_var( $assoc_args['force-update'] ?? false, FILTER_VALIDATE_BOOLEAN );
+			$cah_importer  = filter_var( $assoc_args['use-cah-importer'] ?? false, FILTER_VALIDATE_BOOLEAN );
+
+			if ( $cah_importer ) {
+				$importer = new Importers\CSVThumbnailImporter( $filepath, $base_url, $force_update );
+			} else {
+				$importer = new Importers\WordPressThumbnailImporter( $filepath, $base_url, $post_meta_key, $force_update );
+			}
+
+			try {
+				$importer->import();
+				\WP_CLI::success( $importer->print_stats() );
+			} catch ( Exception $e ) {
+				\WP_CLI::error( $e->message );
+			}
+		}
 	}
 }
