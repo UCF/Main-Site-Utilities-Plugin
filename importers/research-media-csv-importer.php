@@ -1,13 +1,13 @@
 <?php
 /**
- * Imports thumbnails for researchers from WordPress Exports
+ * Imports thumbnails for researchers from CSV Exports
+ * provided by the College of Arts and Humanities
  */
 namespace UCF\MainSiteUtilities\Importers {
 	class CSVThumbnailImporter {
 		private
 			$csv_data,
 			$base_url,
-			$source_meta_key,
 			$matched_records,
 			$media_base_url,
 			$force_update = false,
@@ -111,7 +111,7 @@ namespace UCF\MainSiteUtilities\Importers {
 
 			if ( $media_data ) {
 				$retval = $media_data->source_url;
-				if ( strpos( $retval, strval( $this->base_url ) ) == -1 ) {
+				if ( strpos( $retval, strval( $this->base_url ) ) === false ) {
 					$retval = $this->base_url . $retval;
 				}
 
@@ -122,7 +122,7 @@ namespace UCF\MainSiteUtilities\Importers {
 		}
 
 		/**
-		 * Parses the WP Export File
+		 * Parses the CAH provided CSV file
 		 * @author Jim Barnes
 		 * @since 2.0.0
 		 */
