@@ -141,6 +141,10 @@ namespace UCF\MainSiteUtilities\Importers {
 		 */
 		private function parse_file() {
 			foreach( $this->wp_file->item as $item ) {
+				if ( trim( $item->xpath( 'wp:status' )[0] ) !== 'publish' ) {
+					continue;
+				}
+
 				$this->processed++;
 
 				// Start person loop
@@ -148,11 +152,11 @@ namespace UCF\MainSiteUtilities\Importers {
 				$person_thumbnail_id = null;
 
 				foreach( $item->xpath( 'wp:postmeta' ) as $postmeta ) {
-					if ( $postmeta->xpath( 'wp:meta_key' )[0] == $this->source_meta_key ) {
+					if ( trim( $postmeta->xpath( 'wp:meta_key' )[0] ) === $this->source_meta_key ) {
 						$person_email = $postmeta->xpath( 'wp:meta_value' )[0];
 					}
 
-					if ( $postmeta->xpath( 'wp:meta_key' )[0] == '_thumbnail_id' ) {
+					if ( trim( $postmeta->xpath( 'wp:meta_key' )[0] ) === '_thumbnail_id' ) {
 						$person_thumbnail_id = $postmeta->xpath( 'wp:meta_value' )[0];
 					}
 				}
@@ -204,6 +208,12 @@ namespace UCF\MainSiteUtilities\Importers {
 				}
 
 				$image_url = $this->get_person_image( $record['thumb_id'] );
+
+				if ( ! $image_url ) {
+					$this->thumbnails_errors++;
+					continue;
+				}
+
 				$filename = basename( $image_url );
 				$tmp_file = download_url( $image_url, 30 );
 

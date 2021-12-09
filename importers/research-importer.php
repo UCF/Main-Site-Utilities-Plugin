@@ -263,7 +263,7 @@ Deleted  : {$this->researchers_deleted}
 					'person_last_name'   => $researcher->employee_record->last_name,
 					'person_titles'      => $job_titles,
 					'person_email'       => $researcher->teledata_record ? $researcher->teledata_record->email : null,
-					'person_phone'       => $researcher->teledata_record ? $researcher->teledata_record->email : null,
+					'person_phone'       => $researcher->teledata_record ? $researcher->teledata_record->phone : null,
 					'person_degrees'     => $educational_info,
 					'person_books'       => $books,
 					'person_articles'    => $articles,
