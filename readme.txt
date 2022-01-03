@@ -1,9 +1,9 @@
 === Main Site Utilities WP-CLI Package ===
 Contributors: ucfwebcom
 Tags: ucf, wp cli, wp, cli
-Requires at least: 4.7.5
-Tested up to: 4.7.5
-Stable tag: 1.0.1
+Requires at least: 5.3
+Tested up to: 5.3
+Stable tag: 2.0.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/copyleft/gpl-3.0.html
 
@@ -48,6 +48,11 @@ wp research import
 
 
 == Changelog ==
+
+= 2.0.0 =
+Enhancements:
+* Added importers for research from the search service, as well as for researchers' data from external WP instances.
+* Removed importers that are no longer in use.
 
 = 1.0.1 =
 Enhancements:
