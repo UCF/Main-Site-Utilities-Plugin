@@ -9,20 +9,14 @@ if ( ! defined( 'WPINC' ) ) {
     die;
 }
 
+define( 'UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	// Pull in the degree importer files.
-	require_once 'importers/degree-importer.php';
-	require_once 'importers/degree-importer-exceptions.php';
-	require_once 'importers/tuition-fees-importer.php';
+	require_once UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR . 'importers/research-importer.php';
+	require_once UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR . 'importers/research-media-importer.php';
+	require_once UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR . 'importers/research-media-csv-importer.php';
+	require_once UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR . 'includes/commands.php';
 
-	require_once 'converters/resource-converter.php';
-
-	require_once 'includes/degrees.php';
-	require_once 'includes/converters.php';
-
-	WP_CLI::add_command( 'mainsite degrees', 'Degrees' );
-	WP_CLI::add_command( 'mainsite converters', 'Converters' );
-
+	WP_CLI::add_command( 'research', 'UCF\MainSiteUtilities\Commands\ResearchCommands' );
 }
-
-?>

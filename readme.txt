@@ -27,31 +27,24 @@ Provides utilities (jobs) to run for the main website.
 
 == Commands ==
 
-All commands are stored under the `mainsite` core command. To see available options run `wp mainsite`.
+=== Research Import ===
 
-= Degree Commands =
+```
+wp research import
+    <search_url>
+    [--params=<params>]
+    [--force-template=<bool>]
+    [--force-update=<bool>]
+```
 
-All degree commands are stored under the `degrees` command. To see avilable options run `wp mainsite degrees`.
+**Options**
 
-Import: `wp mainsite degrees import <search_url> <catalog_url> [--publish]`
-
-Imports degrees into the main site.
-
-- <search_url>
-    - The url of the search service. (Required)
-- <catalog_url>
-    - The url of the undergraduate catalog api. (Required)
-- [--publish]
-    - Flag that publishes all new degrees. (Optional)
-
-Tuition and Fees: `wp mainsite degrees tuition <api>`
-
-Adds tuition and fee information to main site degrees.
-
-- <api>
-    - The url of the tuition feed
-
-Imports degrees from various sources and writes them into degree custom post types.
+| Option | Type | Description | Default |
+|---|---|---|---|
+| `search_url` | `string` | The URL of the search service. | empty |
+| `--params` | `string` | An HTML encoded parameter string. Can be used to add additional filtering to the search service endpoint. | null |
+| `--force-template` | `bool` | If True, forces an update to the page template for each researcher imported. | false |
+| `--force-update` | `bool` | If True, removes all researchers prior to importing. | false |
 
 
 == Changelog ==
