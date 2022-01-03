@@ -42,6 +42,11 @@ wp research import
 
 ## Changelog ##
 
+### 2.0.0 ###
+Enhancements:
+* Added importers for research from the search service, as well as for researchers' data from external WP instances.
+* Removed importers that are no longer in use.
+
 ### 1.0.1 ###
 Enhancements:
 * Added converter/importer for azindex links.
