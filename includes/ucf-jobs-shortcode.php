@@ -47,7 +47,7 @@ class Jobs_Shortcode {
 		if ( $items !== null && $items->jobPostings ) {
 			echo Jobs_Shortcode::sc_ucf_jobs_display_jobs_list( $items->jobPostings, $attr['ul_classes'], $attr['li_classes'] );
 		} else {
-			echo 'No jobs listing data to display.'
+			echo 'No jobs listing data to display.';
 		}
 
 		return ob_get_clean();
