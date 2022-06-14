@@ -1,15 +1,22 @@
 <?php
 /*
 Plugin Name: Main Site Utilities
-Version: 2.0.0
-Author: Jim Barnes
-Description: This is my plugin description.
+Description: Utility plugin for UCF's main site.
+Version: rc-2.1.0
+Author: UCF Web Communications
 */
+
+namespace UCF\MainSiteUtilities;
+
 if ( ! defined( 'WPINC' ) ) {
-    die;
+	die;
 }
 
 define( 'UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+
+require_once UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR . 'includes/config.php';
+require_once UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR . 'includes/ucf-jobs-feed.php';
+require_once UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR . 'includes/ucf-jobs-shortcode.php';
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	// Pull in the degree importer files.
@@ -20,3 +27,7 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 
 	WP_CLI::add_command( 'research', 'UCF\MainSiteUtilities\Commands\ResearchCommands' );
 }
+
+add_action( 'plugins_loaded', function() {
+	add_action( 'init', array( __NAMESPACE__ . '\Shortcodes\Jobs_Shortcode', 'register_shortcode' ) );
+} );
