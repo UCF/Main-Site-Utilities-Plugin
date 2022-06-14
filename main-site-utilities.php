@@ -1,15 +1,16 @@
 <?php
 /*
 Plugin Name: Main Site Utilities
-Version: 2.0.0
-Author: Jim Barnes
-Description: This is my plugin description.
+Description: Utility plugin for UCF's main site.
+Version: rc-2.1.0
+Author: UCF Web Communications
 */
-if ( ! defined( 'WPINC' ) ) {
-    die;
-}
 
-define( 'UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+namespace UCF\MainSiteUtilities;
+
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	// Pull in the degree importer files.
