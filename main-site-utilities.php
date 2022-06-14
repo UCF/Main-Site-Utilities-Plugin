@@ -12,6 +12,9 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+define( 'UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+
+require_once UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR . 'includes/config.php';
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	// Pull in the degree importer files.
 	require_once UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR . 'importers/research-importer.php';
