@@ -9,7 +9,7 @@ namespace UCF\MainSiteUtilities\Feeds;
  * Retrieve the job listing data from the given feed url.
  *
  * @author Cadie Stockman
- * @since 2.1.0
+ * @since 3.0.0
  * @param array $args Arg array
  * @return object $result Job listings data
  **/
