@@ -28,6 +28,4 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	WP_CLI::add_command( 'research', 'UCF\MainSiteUtilities\Commands\ResearchCommands' );
 }
 
-add_action( 'plugins_loaded', function() {
-	add_action( 'init', array( __NAMESPACE__ . '\Shortcodes\Jobs_Shortcode', 'register_shortcode' ) );
-} );
+add_action( 'init', array( __NAMESPACE__ . '\Shortcodes\Jobs_Shortcode', 'register_shortcode' ) );
