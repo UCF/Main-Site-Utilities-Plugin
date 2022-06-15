@@ -29,11 +29,11 @@ class Jobs_Shortcode {
 	 */
 	public static function sc_ucf_jobs( $attr, $content='' ) {
 		$attr = shortcode_atts( array(
-			'limit'  => 10,
-			'offset' => 0,
+			'limit'      => 10,
+			'offset'     => 0,
 			'ul_classes' => '',
 			'li_classes' => '',
-			'a_classes' => ''
+			'a_classes'  => ''
 		), $attr );
 
 		$args = array(
