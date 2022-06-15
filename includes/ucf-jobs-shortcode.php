@@ -12,7 +12,7 @@ class Jobs_Shortcode {
 	 * Registers the `ucf-jobs` shortcode.
 	 *
 	 * @author Cadie Stockman
-	 * @since 2.1.0
+	 * @since 3.0.0
 	 */
 	public static function register_shortcode() {
 		add_shortcode( 'ucf-jobs', array( __NAMESPACE__ . '\Jobs_Shortcode', 'sc_ucf_jobs' ) );
@@ -22,18 +22,18 @@ class Jobs_Shortcode {
 	 * Generates the `ucf-jobs` markup.
 	 *
 	 * @author Cadie Stockman
-	 * @since 2.1.0
+	 * @since 3.0.0
 	 * @param array $attr The parsed attribute array
 	 * @param string $content Content passed into the shortcode
 	 * @return string
 	 */
 	public static function sc_ucf_jobs( $attr, $content='' ) {
 		$attr = shortcode_atts( array(
-			'limit'  => 10,
-			'offset' => 0,
+			'limit'      => 10,
+			'offset'     => 0,
 			'ul_classes' => '',
 			'li_classes' => '',
-			'a_classes' => ''
+			'a_classes'  => ''
 		), $attr );
 
 		$args = array(
@@ -58,7 +58,7 @@ class Jobs_Shortcode {
 	 * Returns the HTML markup for the job postings
 	 * in an unordered list.
 	 *
-	 * @since 2.1.0
+	 * @since 3.0.0
 	 * @param array $job_postings The array of job postings from the Jobs feed
 	 * @param array $attr Array of given shortcode attributes
 	 * @return string HTML list markup

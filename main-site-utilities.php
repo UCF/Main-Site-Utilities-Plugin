@@ -2,7 +2,7 @@
 /*
 Plugin Name: Main Site Utilities
 Description: Utility plugin for UCF's main site.
-Version: rc-2.1.0
+Version: rc-3.0.0
 Author: UCF Web Communications
 */
 
@@ -28,6 +28,4 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	WP_CLI::add_command( 'research', 'UCF\MainSiteUtilities\Commands\ResearchCommands' );
 }
 
-add_action( 'plugins_loaded', function() {
-	add_action( 'init', array( __NAMESPACE__ . '\Shortcodes\Jobs_Shortcode', 'register_shortcode' ) );
-} );
+add_action( 'init', array( __NAMESPACE__ . '\Shortcodes\Jobs_Shortcode', 'register_shortcode' ) );

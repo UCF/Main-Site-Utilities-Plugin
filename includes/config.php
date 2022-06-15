@@ -18,7 +18,7 @@ define( 'UCF_MAIN_SITE_UTILITIES__CUSTOMIZER_DEFAULTS', serialize( array(
 /**
  * Returns a plugin option's default value.
  *
- * @since 2.1.0
+ * @since 3.0.0
  * @param string $option_name The name of the option
  * @return mixed Option default value, or false if a default is not set
  */
@@ -34,7 +34,7 @@ function get_option_default( $option_name ) {
 /**
  * Initialization functions to be fired early when WordPress loads the plugin.
  *
- * @since 2.1.0
+ * @since 3.0.0
  * @return void
  */
 function init() {
@@ -84,7 +84,7 @@ add_action( 'init', __NAMESPACE__ . '\init' );
 /**
  * Defines sections used in the WordPress Customizer.
  *
- * @since 2.1.0
+ * @since 3.0.0
  * @author Cadie Stockman
  */
 function define_customizer_sections( $wp_customize ) {
@@ -102,7 +102,7 @@ add_action( 'customize_register', __NAMESPACE__ . '\define_customizer_sections' 
 /**
  * Defines settings and controls used in the WordPress Customizer.
  *
- * @since 2.1.0
+ * @since 3.0.0
  * @author Cadie Stockman
  */
 function define_customizer_fields( $wp_customize ) {

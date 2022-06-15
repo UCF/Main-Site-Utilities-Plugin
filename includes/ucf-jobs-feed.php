@@ -9,7 +9,7 @@ namespace UCF\MainSiteUtilities\Feeds;
  * Retrieve the job listing data from the given feed url.
  *
  * @author Cadie Stockman
- * @since 2.1.0
+ * @since 3.0.0
  * @param array $args Arg array
  * @return object $result Job listings data
  **/
@@ -32,8 +32,27 @@ function retrieve_job_listing_data( $args ) {
 	$result        = false;
 
 	if ( is_array( $response ) && is_int( $response_code ) && $response_code < 400 ) {
-		$result = json_decode( wp_remote_retrieve_body( $response ) );
+		$response_body = wp_remote_retrieve_body( $response );
+		$result = validate_json( $response_body ) ? json_decode( $response_body ) : false;
 	}
 
 	return $result;
+}
+
+
+/**
+ * Checks if the given string is valid JSON.
+ *
+ * @author Cadie Stockman
+ * @since 3.0.0
+ * @param string $str Given string
+ * @return boolean Returns true if valid JSON.
+ **/
+function validate_json( $str ) {
+	if ( is_string( $str ) ) {
+		json_decode( $str );
+		return ( json_last_error() === JSON_ERROR_NONE );
+	}
+
+	return false;
 }
