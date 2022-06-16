@@ -25,7 +25,7 @@ class Jobs_Shortcode {
 	 * @since 3.0.0
 	 * @param array $attr The parsed attribute array
 	 * @param string $content Content passed into the shortcode
-	 * @return string
+	 * @return string HTML markup for displaying job listings
 	 */
 	public static function sc_ucf_jobs( $attr, $content='' ) {
 		$attr = shortcode_atts( array(
@@ -45,7 +45,7 @@ class Jobs_Shortcode {
 
 		ob_start();
 
-		if ( $items !== null && $items->jobPostings ) {
+		if ( $items && $items->jobPostings ) {
 			echo Jobs_Shortcode::sc_ucf_jobs_display_jobs_list( $items->jobPostings, $attr );
 		} else {
 			echo 'No job listings to display.';

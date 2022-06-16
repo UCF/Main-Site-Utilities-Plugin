@@ -11,7 +11,7 @@ namespace UCF\MainSiteUtilities\Feeds;
  * @author Cadie Stockman
  * @since 3.0.0
  * @param array $args Arg array
- * @return object $result Job listings data
+ * @return object|false $result Job listings object data or false if JSON data cannot be retrieved
  **/
 function retrieve_job_listing_data( $args ) {
 	$feed_url = get_option( UCF_MAIN_SITE_UTILITIES__CUSTOMIZER_PREFIX . 'jobs_feed_url' );
@@ -32,27 +32,8 @@ function retrieve_job_listing_data( $args ) {
 	$result        = false;
 
 	if ( is_array( $response ) && is_int( $response_code ) && $response_code < 400 ) {
-		$response_body = wp_remote_retrieve_body( $response );
-		$result = validate_json( $response_body ) ? json_decode( $response_body ) : false;
+		$result = json_decode( wp_remote_retrieve_body( $response ) );
 	}
 
-	return $result;
-}
-
-
-/**
- * Checks if the given string is valid JSON.
- *
- * @author Cadie Stockman
- * @since 3.0.0
- * @param string $str Given string
- * @return boolean Returns true if valid JSON.
- **/
-function validate_json( $str ) {
-	if ( is_string( $str ) ) {
-		json_decode( $str );
-		return ( json_last_error() === JSON_ERROR_NONE );
-	}
-
-	return false;
+	return ( ! is_null( $result ) ) ? $result : false;
 }
