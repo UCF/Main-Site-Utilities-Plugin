@@ -33,15 +33,22 @@ class Jobs_Shortcode {
 			'offset'     => 0,
 			'ul_classes' => '',
 			'li_classes' => '',
-			'a_classes'  => ''
+			'a_classes'  => '',
+			'category'   => '',
+			'location'   => ''
 		), $attr );
 
 		$args = array(
-			'limit'    => $attr['limit'] ? (int) $attr['limit'] : 10,
-			'offset'   => $attr['offset'] ? (int) $attr['offset'] : 0
+			'limit'  => $attr['limit'] ? (int) $attr['limit'] : 10,
+			'offset' => $attr['offset'] ? (int) $attr['offset'] : 0
 		);
 
-		$items = Feeds\retrieve_job_listing_data( $args );
+		$filters = array(
+			'category' => $attr['category'] ? (string) $attr['category'] : '',
+			'location' => $attr['location'] ? (string) $attr['location'] : ''
+		)
+
+		$items = Feeds\retrieve_job_listing_data( $args, $filters );
 
 		ob_start();
 
