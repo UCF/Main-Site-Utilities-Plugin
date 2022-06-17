@@ -10,17 +10,22 @@ namespace UCF\MainSiteUtilities\Feeds;
  *
  * @author Cadie Stockman
  * @since 3.0.0
- * @param array $args Arg array
+ * @param array $args Includes the generic given post args 
+ * @param array $filters Includes the job filter args
  * @return object|false $result Job listings object data or false if JSON data cannot be retrieved
  **/
-function retrieve_job_listing_data( $args ) {
+function retrieve_job_listing_data( $args, $filters ) {
 	$feed_url = get_option( UCF_MAIN_SITE_UTILITIES__CUSTOMIZER_PREFIX . 'jobs_feed_url' );
+
+	// Convert $filters into a JSON object in order to pass it to 'appliedFacets'
+	$filters = wp_json_encode( $filters, JSON_FORCE_OBJECT );
+
 	$post_args = array(
 		'body' => wp_json_encode( array(
-			// 'appliedFacets' => {}, // TODO: Add feature for defining job type filters
-			'limit'      => $args['limit'],
-			'offset'     => $args['offset'],
-			'searchText' => ''
+			'appliedFacets' => $filters,
+			'limit'         => $args['limit'],
+			'offset'        => $args['offset'],
+			'searchText'    => ''
 		) ),
 		'headers' => array(
 			'content-type' => 'application/json'
