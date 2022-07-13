@@ -49,6 +49,14 @@ wp research import
 
 == Changelog ==
 
+= 3.0.0 =
+Enhancements:
+* Addition of the Workday job listings shortcode `[ucf-jobs]`.
+* This also changes the main plugin's file name from commands.php to main-site-utilities.php, which results in the plugin being deactivated if pushed when currently activated for the site. To go around this we can just deactivate it before we push up the changes to new environments. This shouldn't effect anything, since the only thing we use this plugin for currently is running WP-CLI commands.
+* New customizer options have been created for the Jobs/WorkDay URLs for the feed and the base site URL. The base URL is used to create the individual job listing links, since just the relative path to them is included in the json feed. The defaults set for them will need to be updated once we have the "live" WorkDay URLs come July 1.
+* A future PR will add in the ability to filter listings by Job Family (faculty, staff, etc).
+
+
 = 2.0.0 =
 Enhancements:
 * Added importers for research from the search service, as well as for researchers' data from external WP instances.
