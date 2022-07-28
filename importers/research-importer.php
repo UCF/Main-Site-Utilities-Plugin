@@ -48,6 +48,7 @@ namespace UCF\MainSiteUtilities\Importers {
 
 			$this->get_researchers();
 			$this->import_researchers();
+			$this->import_research();
 			$this->delete_stale_records();
 		}
 
@@ -106,10 +107,15 @@ Deleted  : {$this->researchers_deleted}
 				'meta_value'     => 'faculty'
 			) );
 
+			$progress = \WP_CLI\Utils\make_progress_bar( "Deleting existing researchers...", count( $researchers ) );
+
 			foreach( $researchers as $researcher ) {
 				wp_delete_post( $researcher->ID, true );
 				$this->researchers_deleted++;
+				$progress->tick();
 			}
+
+			$progress->finish();
 		}
 
 		/**
@@ -150,13 +156,42 @@ Deleted  : {$this->researchers_deleted}
 		 * when retrieving research citations
 		 * @author Jim Barnes
 		 * @since 2.0.0
-		 * @param object $obj The JSON object
+		 * @param array $items The array of JSON objects
 		 * @return string
 		 */
-		public function get_simple_citation_html( $obj ) {
-			return array(
-				'citation' => $obj->simple_citation_html
-			);
+		public function format_citations_and_authors( $items, $author_post_id ) {
+			return array_map( function( $item ) use ( $author_post_id ) {
+				return array(
+					'citation'                => $item->simple_citation_html,
+					'additional_contributors' => $this->get_research_contributors( $item, $author_post_id )
+				);
+			}, $items );
+		}
+
+		/**
+		 * Gets the UCF employees who contributed
+		 * to this research project.
+		 *
+		 * @author Jim Barnes
+		 * @since 3.0.1
+		 * @param  object $obj The JSON object
+		 * @param  int $author_post_id The post ID of the author being processed
+		 * @return array The array of post_ids pointing to the researchers
+		 */
+		public function get_research_contributors( $obj, $author_post_id ) {
+			$retval = array();
+
+			foreach( $obj->researchers as $researcher ) {
+				$post_id = isset( $this->post_ids_processed[$researcher->employee_id] ) ?
+					$this->post_ids_processed[$researcher->employee_id] :
+					null;
+
+				if ( $post_id && $post_id !== $author_post_id ) {
+					$retval[] = $post_id;
+				}
+			}
+
+			return $retval;
 		}
 
 		/**
@@ -187,6 +222,8 @@ Deleted  : {$this->researchers_deleted}
 		 * @return void
 		 */
 		private function import_researchers() {
+			$progress = \WP_CLI\Utils\make_progress_bar( "Importing researchers...", count( $this->researchers ) );
+
 			foreach( $this->researchers as $researcher ) {
 				$this->researchers_processed++;
 
@@ -215,8 +252,6 @@ Deleted  : {$this->researchers_deleted}
 					$this->researchers_created ++;
 				}
 
-				$this->post_ids_processed[] = $post_id;
-
 				// Capture all of the job titles
 				$job_titles = array();
 
@@ -240,24 +275,6 @@ Deleted  : {$this->researchers_deleted}
 					);
 				}
 
-				$books_resp       = $this->fetch_json( $researcher->books );
-				$articles_resp    = $this->fetch_json( $researcher->articles );
-				$chapters_resp    = $this->fetch_json( $researcher->book_chapters );
-				$proceedings_resp = $this->fetch_json( $researcher->conference_proceedings );
-				$grants_resp      = $this->fetch_json( $researcher->grants );
-				$awards_resp      = $this->fetch_json( $researcher->honorific_awards );
-				$patents_resp     = $this->fetch_json( $researcher->patents );
-				$trials_resp      = $this->fetch_json( $researcher->clinical_trials );
-
-				$books       = array_map( array($this, 'get_simple_citation_html'), $books_resp->results );
-				$articles    = array_map( array($this, 'get_simple_citation_html'), $articles_resp->results );
-				$chapters    = array_map( array($this, 'get_simple_citation_html'), $chapters_resp->results );
-				$proceedings = array_map( array($this, 'get_simple_citation_html'), $proceedings_resp->results );
-				$grants      = array_map( array($this, 'get_simple_citation_html'), $grants_resp->results );
-				$awards      = array_map( array($this, 'get_simple_citation_html'), $awards_resp->results );
-				$patents     = array_map( array($this, 'get_simple_citation_html'), $patents_resp->results );
-				$trials      = array_map( array($this, 'get_simple_citation_html'), $trials_resp->results );
-
 				$post_meta = array(
 					'person_employee_id' => $researcher->employee_record->ext_employee_id,
 					'person_last_name'   => $researcher->employee_record->last_name,
@@ -265,14 +282,6 @@ Deleted  : {$this->researchers_deleted}
 					'person_email'       => $researcher->teledata_record ? $researcher->teledata_record->email : null,
 					'person_phone'       => $researcher->teledata_record ? $researcher->teledata_record->phone : null,
 					'person_degrees'     => $educational_info,
-					'person_books'       => $books,
-					'person_articles'    => $articles,
-					'person_chapters'    => $chapters,
-					'person_proceedings' => $proceedings,
-					'person_grants'      => $grants,
-					'person_awards'      => $awards,
-					'person_patents'     => $patents,
-					'person_trials'      => $trials,
 					'person_type'        => 'faculty',
 				);
 
@@ -296,7 +305,69 @@ Deleted  : {$this->researchers_deleted}
 				foreach( $post_meta as $key => $val ) {
 					\update_field( $key, $val, $post_id );
 				}
+
+				$this->post_ids_processed[$researcher->employee_record->ext_employee_id] = $post_id;
+				$progress->tick();
 			}
+
+			$progress->finish();
+		}
+
+		/**
+		 * Imports the research works for all the researchers
+		 *
+		 * @author Jim Barnes
+		 * @since 3.0.1
+		 * @return void
+		 */
+		private function import_research() {
+			$progress = \WP_CLI\Utils\make_progress_bar( "Importing research...", count( $this->researchers ) );
+
+			foreach( $this->researchers as $researcher ) {
+				$post_id = isset( $this->post_ids_processed[$researcher->employee_record->ext_employee_id] ) ?
+					$this->post_ids_processed[$researcher->employee_record->ext_employee_id] :
+					null;
+
+				if ( ! $post_id ) continue;
+
+				$books_resp       = $this->fetch_json( $researcher->books );
+				$articles_resp    = $this->fetch_json( $researcher->articles );
+				$chapters_resp    = $this->fetch_json( $researcher->book_chapters );
+				$proceedings_resp = $this->fetch_json( $researcher->conference_proceedings );
+				$grants_resp      = $this->fetch_json( $researcher->grants );
+				$awards_resp      = $this->fetch_json( $researcher->honorific_awards );
+				$patents_resp     = $this->fetch_json( $researcher->patents );
+				$trials_resp      = $this->fetch_json( $researcher->clinical_trials );
+
+
+				$books       = $this->format_citations_and_authors( $books_resp->results, $post_id );
+				$articles    = $this->format_citations_and_authors( $articles_resp->results, $post_id );
+				$chapters    = $this->format_citations_and_authors( $chapters_resp->results, $post_id );
+				$proceedings = $this->format_citations_and_authors( $proceedings_resp->results, $post_id );
+				$grants      = $this->format_citations_and_authors( $grants_resp->results, $post_id );
+				$awards      = $this->format_citations_and_authors( $awards_resp->results, $post_id );
+				$patents     = $this->format_citations_and_authors( $patents_resp->results, $post_id );
+				$trials      = $this->format_citations_and_authors( $trials_resp->results, $post_id );
+
+				$post_meta = array(
+					'person_books'       => $books,
+					'person_articles'    => $articles,
+					'person_chapters'    => $chapters,
+					'person_proceedings' => $proceedings,
+					'person_grants'      => $grants,
+					'person_awards'      => $awards,
+					'person_patents'     => $patents,
+					'person_trials'      => $trials,
+				);
+
+				foreach( $post_meta as $key => $val ) {
+					\update_field( $key, $val, $post_id );
+				}
+
+				$progress->tick();
+			}
+
+			$progress->finish();
 		}
 
 		/**
@@ -308,7 +379,7 @@ Deleted  : {$this->researchers_deleted}
 		private function delete_stale_records() {
 			$args = array(
 				'post_type'      => 'person',
-				'post__not_in'   => $this->post_ids_processed,
+				'post__not_in'   => array_values( $this->post_ids_processed ),
 				'posts_per_page' => -1,
 				'meta_key'       => 'person_type',
 				'meta_value'     => 'faculty'
