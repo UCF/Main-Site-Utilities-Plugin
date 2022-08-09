@@ -25,7 +25,7 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR . 'importers/research-media-csv-importer.php';
 	require_once UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR . 'includes/commands.php';
 
-	WP_CLI::add_command( 'research', 'UCF\MainSiteUtilities\Commands\ResearchCommands' );
+	\WP_CLI::add_command( 'research', 'UCF\MainSiteUtilities\Commands\ResearchCommands' );
 }
 
 add_action( 'init', array( __NAMESPACE__ . '\Shortcodes\Jobs_Shortcode', 'register_shortcode' ) );
