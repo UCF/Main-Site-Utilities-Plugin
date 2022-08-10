@@ -3,7 +3,7 @@ Contributors: ucfwebcom
 Tags: ucf, wp cli, wp, cli
 Requires at least: 5.3
 Tested up to: 5.3
-Stable tag: 2.0.0
+Stable tag: 3.0.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/copyleft/gpl-3.0.html
 
@@ -48,6 +48,10 @@ wp research import
 
 
 == Changelog ==
+
+= 3.0.1 =
+Bug Fixes:
+* Corrected a syntax error that causes problems when using WP CLI.
 
 = 3.0.0 =
 Enhancements:
