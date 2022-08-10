@@ -2,7 +2,7 @@
 /*
 Plugin Name: Main Site Utilities
 Description: Utility plugin for UCF's main site.
-Version: 3.0.0
+Version: 3.0.1
 Author: UCF Web Communications
 */
 
