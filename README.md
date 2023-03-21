@@ -42,6 +42,10 @@ wp research import
 
 ## Changelog ##
 
+### 3.0.2 ###
+Enhancements:
+* Added composer file.
+
 ### 3.0.1 ###
 Bug Fixes:
 * Corrected a syntax error that causes problems when using WP CLI.
