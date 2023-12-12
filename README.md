@@ -40,7 +40,26 @@ wp research import
 | `--force-update` | `bool` | If True, removes all researchers prior to importing. | false |
 
 
+# Expert Import #
+
+```
+wp research import
+    <csv_url>
+    [--force-template=<bool>]
+    [--force-update=<bool>]
+```
+
+| Option | Type | Description | Default |
+|---|---|---|---|
+| `csv_url` | `string` | The URL of the CSV containing the experts to import. | empty |
+| `--force-template` | `bool` | If True, forces an update to the page template for each expert imported. | false |
+| `--force-update` | `bool` | If True, removes all experts prior to importing. | false |
+
 ## Changelog ##
+
+### 3.1.0 ###
+Enhancements:
+* Added an expert importer.
 
 ### 3.0.2 ###
 Enhancements:
