@@ -57,6 +57,10 @@ wp research import
 
 ## Changelog ##
 
+### 3.1.1 ###
+Bug Fixes:
+* The code for the prior release was never checked in.
+
 ### 3.1.0 ###
 Enhancements:
 * Added an expert importer.
