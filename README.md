@@ -43,7 +43,7 @@ wp research import
 # Expert Import #
 
 ```
-wp research import
+wp expert import
     <csv_url>
     [--force-template=<bool>]
     [--force-update=<bool>]
