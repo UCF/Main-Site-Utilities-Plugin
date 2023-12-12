@@ -9,7 +9,7 @@ namespace UCF\MainSiteUtilities\Importers {
             $force_template = false,
             $force_update = false,
             $expert_term = false,
-            
+
             // Stats
             $processed = 0,
             $creates = 0,
@@ -21,7 +21,7 @@ namespace UCF\MainSiteUtilities\Importers {
         /**
          * Constructs a new instance
          * of the ExpertImporter
-         * 
+         *
          * @author Jim Barnes
          * @since 3.1.0
          * @param string $csv_url The URL of the CSV file to be imported
@@ -37,11 +37,15 @@ namespace UCF\MainSiteUtilities\Importers {
         /**
          * The primary entry point for starting
          * the import.
-         * 
+         *
          * @author Jim Barnes
          * @since 3.1.0
          */
         public function import() {
+            if ( $this->force_update ) {
+                $this->remove_records();
+            }
+
             $this->expert_term = $this->get_expert_term();
             $records = $this->get_csv_data();
             $this->import_records( $records );
@@ -51,7 +55,7 @@ namespace UCF\MainSiteUtilities\Importers {
          * Returns the import statistics
          * so they can be written to the
          * screen.
-         * 
+         *
          * @author Jim Barnes
          * @since 3.1.0
          * @return string
@@ -70,11 +74,45 @@ Tags Created     : $this->tags_created
             ";
         }
 
+        /**
+         * Removes all records prior to import
+         *
+         * @author Jim Barnes
+         * @since 3.1.0
+         */
+        private function remove_records() {
+            $expert_term = $this->get_expert_term();
+
+            $args = array(
+                'post_type'      => 'person',
+                'post_status'    => 'any',
+                'posts_per_page' => -1,
+                'tax_query' => array(
+                    'taxonomy' => 'people_group',
+                    'field'    => 'term_id',
+                    'terms'    => $expert_term->term_id
+                )
+            );
+
+            $posts = get_posts( $args );
+            $post_count = count( $posts );
+            \WP_CLI::Log( "Deleting $post_count posts before importing..." );
+
+            $delete_count = 0;
+
+            foreach( $posts as $post ) {
+                wp_delete_post( $post->ID, true );
+                $delete_count++;
+            }
+
+            \WP_CLI::Log( "Deleted $delete_count posts." );
+        }
+
 
         /**
          * Gets or creates the expert
          * people_group term.
-         * 
+         *
          * @author Jim Barnes
          * @since 3.1.0
          * @return WP_Term
@@ -118,7 +156,7 @@ Tags Created     : $this->tags_created
                 );
 
                 $rows = explode( "\n", $data );
-                
+
                 // Get the fields
                 foreach ( str_getcsv( $rows[0] ) as $index => $col_name ) {
                     $fields[$index] = utf8_encode( trim( $col_name ) );
@@ -137,6 +175,8 @@ Tags Created     : $this->tags_created
 
                     $result[] = (object) $record;
                 }
+            } else {
+                throw new Exception( "There was an error retrieving the CSV file." );
             }
 
             return $result;
@@ -145,7 +185,7 @@ Tags Created     : $this->tags_created
 
         /**
          * Imports the records from the CSV into posts.
-         * 
+         *
          * @author Jim Barnes
          * @since 3.1.0
          * @param array $records The array of records from the CSV
@@ -171,7 +211,7 @@ Tags Created     : $this->tags_created
 
         /**
          * Imports a single record as a post
-         * 
+         *
          * @author Jim Barnes
          * @since 3.1.0
          * @param object $record The record to import
@@ -180,6 +220,7 @@ Tags Created     : $this->tags_created
         private function import_record( $record ) {
             $created = false;
             $name = "$record->first_name $record->last_name";
+            $content = $record->content;
             $slug = sanitize_title( $name );
 
             $args = array(
@@ -195,6 +236,7 @@ Tags Created     : $this->tags_created
                 $post_id = $found_posts[0]->ID;
             } else {
                 $args['post_title'] = $name;
+                $args['post_content'] = $content;
                 $args['post_name'] = $slug;
                 $args['status'] = 'draft';
 
@@ -215,6 +257,12 @@ Tags Created     : $this->tags_created
 
             $tags = $this->format_tags( $record->tags );
             wp_set_object_terms( $post_id, $tags, 'post_tag' );
+
+			$colleges = $this->get_colleges( $record->colleges );
+			wp_set_object_terms( $post_id, $colleges, 'colleges' );
+
+			$departments = $this->get_departments( $record->departments );
+			wp_set_object_terms( $post_id, $departments, 'departments' );
 
             // Post meta time
             if ( ! empty( $record->first_name ) ) {
@@ -281,13 +329,13 @@ Tags Created     : $this->tags_created
             if ( $created ) {
                 wp_publish_post( $post_id );
             }
-                
+
             return $created;
         }
 
         /**
          * Gets or creates the expertise
-         * 
+         *
          * @author Jim Barnes
          * @since 3.1.0
          * @param string $expertise The expertise to get
@@ -308,7 +356,7 @@ Tags Created     : $this->tags_created
                     $term,
                     'expertise'
                 );
-    
+
                 if ( ! $term_obj ) {
                     $data = wp_insert_term(
                         $term,
@@ -319,7 +367,7 @@ Tags Created     : $this->tags_created
                         \WP_CLI::warning( $data );
                         continue;
                     }
-    
+
                     $term_obj = get_term( $data['term_id'] );
 
                     $this->expertise_created++;
@@ -334,14 +382,14 @@ Tags Created     : $this->tags_created
         /**
          * Parses and formats the tags for
          * the expert.
-         * 
+         *
          * @author Jim Barnes
          * @since 3.1.0
          * @param string $tags The comma delimited string of tags
          * @return array
          */
         private function format_tags( $tags ) {
-            $tag_arr = explode( ',', $tags );
+            $tag_arr = explode( ';', $tags );
             $retval = array();
 
             foreach( $tag_arr as $tag ) {
@@ -351,11 +399,73 @@ Tags Created     : $this->tags_created
             return $retval;
         }
 
+		/**
+		 * Returns an array of term_ids found
+		 *
+		 * @author Jim Barnes
+		 * @since 3.1.0
+		 * @param string $colleges The colleges string from the csv
+		 * @return array
+		 */
+		private function get_colleges( $colleges ) {
+			$retval = array();
+			$terms = array();
+
+			$college_names = explode( ';', $colleges );
+
+			foreach( $college_names as $name ) {
+				$name = trim( $name );
+
+				$term_obj = get_term_by(
+					'name',
+					$name,
+					'colleges'
+				);
+
+				if ( $term_obj ) {
+					$retval[] = $term_obj->term_id;
+				}
+			}
+
+			return $retval;
+		}
+
+		/**
+		 * Returns an array of term_ids based on the
+		 * departments passed in.
+		 *
+		 * @author Jim Barnes
+		 * @since 3.1.0
+		 * @param string $departments The departments string from the csv
+		 * @return array
+		 */
+		private function get_departments( $departments ) {
+			$retval = array();
+			$department_names = explode( ';', $departments );
+			$terms = array();
+
+			foreach( $department_names as $name ) {
+				$name = trim( $name );
+
+				$term_obj = get_term_by(
+					'name',
+					$name,
+					'departments'
+				);
+
+				if ( $term_obj ) {
+					$retval[] = $term_obj->term_id;
+				}
+			}
+
+			return $retval;
+		}
+
         /**
          * Handles removing the byte order markers
          * at the beginning of the csv file if they
          * are present.
-         * 
+         *
          * @author Jim Barnes
          * @since 3.1.0
          * @param string $content The CSV string
