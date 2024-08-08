@@ -38,7 +38,7 @@ class Jobs_Shortcode {
 
 		$args = array(
 			'limit'    => $attr['limit'] ? (int) $attr['limit'] : 10,
-			'offset'   => $attr['offset'] ? (int) $attr['offset'] : 0
+			'offset'   => $attr['offset'] ? (int) $attr['offset'] : 0,
 		);
 
 		$items = Feeds\retrieve_job_listing_data( $args );
