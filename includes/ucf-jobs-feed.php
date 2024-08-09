@@ -22,7 +22,6 @@ function retrieve_job_listing_data( $args ) {
 		'reset_cache'=> $args['reset_cache']
 	), $feed_url );
 
-	var_dump($feed_url);
 	$response = wp_remote_get( $feed_url );
 	$response_code = wp_remote_retrieve_response_code( $response );
 	$result        = false;
