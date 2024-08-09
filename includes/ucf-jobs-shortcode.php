@@ -43,8 +43,6 @@ class Jobs_Shortcode {
 			'reset_cache' => $attr['reset_cache'] == 1 ? 1 : 0
 		);
 
-		var_dump($args);
-
 		$items = Feeds\retrieve_job_listing_data( $args );
 
 		ob_start();
