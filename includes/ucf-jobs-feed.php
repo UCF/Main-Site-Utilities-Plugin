@@ -19,8 +19,10 @@ function retrieve_job_listing_data( $args ) {
 	$feed_url = add_query_arg( array(
 		'limit'      => $args['limit'],
 		'offset'     => $args['offset'],
+		'cached_data'=> $args['cached_data']
 	), $feed_url );
 
+	var_dump($feed_url);
 	$response = wp_remote_get( $feed_url );
 	$response_code = wp_remote_retrieve_response_code( $response );
 	$result        = false;

@@ -31,6 +31,7 @@ class Jobs_Shortcode {
 		$attr = shortcode_atts( array(
 			'limit'      => 10,
 			'offset'     => 0,
+			'cached_data'=> true,
 			'ul_classes' => '',
 			'li_classes' => '',
 			'a_classes'  => ''
@@ -39,6 +40,7 @@ class Jobs_Shortcode {
 		$args = array(
 			'limit'    => $attr['limit'] ? (int) $attr['limit'] : 10,
 			'offset'   => $attr['offset'] ? (int) $attr['offset'] : 0,
+			'cached_data' => $attr['cached_data'] ? (boolean) $att['cached_data'] : true
 		);
 
 		$items = Feeds\retrieve_job_listing_data( $args );
@@ -46,7 +48,7 @@ class Jobs_Shortcode {
 		ob_start();
 
 		if ( $items && $items->jobPostings ) {
-			echo Jobs_Shortcode::sc_ucf_jobs_display_jobs_list( $items->jobPostings, $attr );
+			echo Jobs_Shortcode::sc_ucf_jobs_display_jobs_list( $items->jobPostings, $attr, $args );
 		} else {
 			echo 'No job listings to display.';
 		}
@@ -63,19 +65,24 @@ class Jobs_Shortcode {
 	 * @param array $attr Array of given shortcode attributes
 	 * @return string HTML list markup
 	 **/
-	public static function sc_ucf_jobs_display_jobs_list( $job_postings, $attr ) {
+	public static function sc_ucf_jobs_display_jobs_list( $job_postings, $attr, $args ) {
 		$ul_classes = $attr['ul_classes'];
 		$li_classes = $attr['li_classes'];
 		$a_classes  = $attr['a_classes'];
+		$limit = $args['limit'];
+		$offset = $args['offset'];
+
+		# Filter/Slice the array by adding the offset and limit
+		$filtered_jobs = array_slice($job_postings, $offset, $limit);
 
 		ob_start();
 
-		if ( is_array( $job_postings ) ) :
+		if ( is_array( $filtered_jobs ) ) :
 	?>
 		<ul <?php echo ( ! empty( $ul_classes ) ) ? 'class="' . $ul_classes . '"' : ''; ?>>
 
 	<?php
-		foreach ( $job_postings as $job ) :
+		foreach ( $filtered_jobs as $job ) :
 			$title    = ! empty( $job->title ) ? $job->title : '';
 			$base_url = rtrim( get_option( UCF_MAIN_SITE_UTILITIES__CUSTOMIZER_PREFIX . 'jobs_base_url' ), "/" );
 			$url      = ! empty( $job->externalPath ) ? $base_url . $job->externalPath : '';
