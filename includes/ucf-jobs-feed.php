@@ -19,7 +19,7 @@ function retrieve_job_listing_data( $args ) {
 	$feed_url = add_query_arg( array(
 		'limit'      => $args['limit'],
 		'offset'     => $args['offset'],
-		'cached_data'=> $args['cached_data']
+		'reset_cache'=> $args['reset_cache']
 	), $feed_url );
 
 	var_dump($feed_url);

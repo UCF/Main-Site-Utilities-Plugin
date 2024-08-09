@@ -31,7 +31,7 @@ class Jobs_Shortcode {
 		$attr = shortcode_atts( array(
 			'limit'      => 10,
 			'offset'     => 0,
-			'cached_data'=> true,
+			'reset_cache'=> 0,
 			'ul_classes' => '',
 			'li_classes' => '',
 			'a_classes'  => ''
@@ -40,8 +40,10 @@ class Jobs_Shortcode {
 		$args = array(
 			'limit'    => $attr['limit'] ? (int) $attr['limit'] : 10,
 			'offset'   => $attr['offset'] ? (int) $attr['offset'] : 0,
-			'cached_data' => $attr['cached_data'] ? (boolean) $att['cached_data'] : true
+			'reset_cache' => $attr['reset_cache'] == 1 ? 1 : 0
 		);
+
+		var_dump($args);
 
 		$items = Feeds\retrieve_job_listing_data( $args );
 
