@@ -45,8 +45,8 @@ class Jobs_Shortcode {
 
 		ob_start();
 
-		if ( $items && $items->jobPostings ) {
-			echo Jobs_Shortcode::sc_ucf_jobs_display_jobs_list( $items->jobPostings, $attr );
+		if ( $items ) {
+			echo Jobs_Shortcode::sc_ucf_jobs_display_jobs_list( $items, $attr );
 		} else {
 			echo 'No job listings to display.';
 		}
