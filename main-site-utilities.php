@@ -2,7 +2,7 @@
 /*
 Plugin Name: Main Site Utilities
 Description: Utility plugin for UCF's main site.
-Version: 3.0.0
+Version: 3.1.1
 Author: UCF Web Communications
 */
 
@@ -23,9 +23,11 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR . 'importers/research-importer.php';
 	require_once UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR . 'importers/research-media-importer.php';
 	require_once UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR . 'importers/research-media-csv-importer.php';
+	require_once UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR . 'importers/experts-importer.php';
 	require_once UCF_MAIN_SITE_UTILITIES__PLUGIN_DIR . 'includes/commands.php';
 
 	\WP_CLI::add_command( 'research', 'UCF\MainSiteUtilities\Commands\ResearchCommands' );
+	\WP_CLI::add_command( 'expert', 'UCF\MainSiteUtilities\Commands\ExpertCommands' );
 }
 
 add_action( 'init', array( __NAMESPACE__ . '\Shortcodes\Jobs_Shortcode', 'register_shortcode' ) );

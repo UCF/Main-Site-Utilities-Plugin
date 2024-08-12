@@ -94,4 +94,41 @@ namespace UCF\MainSiteUtilities\Commands {
 			}
 		}
 	}
+
+	class ExpertCommands extends \WP_CLI_Command {
+		/**
+		 * Imports experts from a remote CSV file
+		 *
+		 * ## OPTIONS
+		 *
+		 *	<csv_file>
+		 * : The URL of the CSV file to import
+		 *
+		 * [--force-template=<bool>]
+		 * : Whether or not to force update the WordPress template
+		 *
+		 * [--force-update=<bool>]
+		 * : Whether or not all records will be deleted prior to import
+		 *
+		 * ## EXAMPLES
+		 *
+		 *     wp expert import http://127.0.0.1:8000/file.csv --force-template=True
+		 *
+		 * @when after_wp_load
+		 */
+		public function import( $args, $assoc_args ) {
+			list( $csv_url ) = $args;
+			$force_template = filter_var( $assoc_args['force-template'] ?? false, FILTER_VALIDATE_BOOLEAN );
+			$force_update = filter_var( $assoc_args['force-update'] ?? false, FILTER_VALIDATE_BOOLEAN );
+
+			$importer = new Importers\ExpertImporter( $csv_url, $force_template, $force_update );
+
+			try {
+				$importer->import();
+				\WP_CLI::success( $importer->get_stats() );
+			} catch( Exception $e ) {
+				\WP_CLI::error( $e->message );
+			}
+		}
+	}
 }

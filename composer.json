@@ -1,20 +1,8 @@
 {
-    "name": "wp-cli/main-site",
-    "description": "Commands specific to the UCFs Main-Site-Theme",
-    "type": "wp-cli-package",
-    "version": "1.0.0",
-    "homepage": "https://github.com/UCF/Main-Site-Utilities/",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "UCF Web Communications",
-            "email": "webcom@ucf.edu",
-            "homepage": "https://github.com/UCF/"
-        }
-    ],
-    "autoload": {
-        "files": [
-            "commands.php"
-        ]
+    "name": "ucf/main-site-utilities-plugin",
+    "description": "Provides utilities (jobs) to run for the main website.",
+    "type": "wordpress-plugin",
+    "require": {
+        "composer/installers": "~1.0"
     }
 }

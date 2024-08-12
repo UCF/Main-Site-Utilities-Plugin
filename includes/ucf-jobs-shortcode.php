@@ -38,15 +38,15 @@ class Jobs_Shortcode {
 
 		$args = array(
 			'limit'    => $attr['limit'] ? (int) $attr['limit'] : 10,
-			'offset'   => $attr['offset'] ? (int) $attr['offset'] : 0
+			'offset'   => $attr['offset'] ? (int) $attr['offset'] : 0,
 		);
 
 		$items = Feeds\retrieve_job_listing_data( $args );
 
 		ob_start();
 
-		if ( $items && $items->jobPostings ) {
-			echo Jobs_Shortcode::sc_ucf_jobs_display_jobs_list( $items->jobPostings, $attr );
+		if ( $items ) {
+			echo Jobs_Shortcode::sc_ucf_jobs_display_jobs_list( $items, $attr );
 		} else {
 			echo 'No job listings to display.';
 		}
