@@ -9,7 +9,7 @@ namespace UCF\MainSiteUtilities\Includes\Config;
 define( 'UCF_MAIN_SITE_UTILITIES__CUSTOMIZER_PREFIX', defined( 'THEME_CUSTOMIZER_PREFIX' ) ? THEME_CUSTOMIZER_PREFIX : 'ucf_main_site_' );
 
 define( 'UCF_MAIN_SITE_UTILITIES__CUSTOMIZER_DEFAULTS', serialize( array(
-	'jobs_base_url' => 'https://jobs.ucf.edu/jobs/search/',
+	'jobs_base_url' => 'https://jobs.ucf.edu/jobs/',
 	'jobs_feed_url' => 'http://search.cm.ucf.edu/api/v1/positions/'
 ) ) );
 
