@@ -64,6 +64,14 @@ wp expert import
 
 == Changelog ==
 
+= 3.2.1 =
+Bug Fixes:
+* Base url was changed in order to fix the outgoing links.
+
+= 3.2.0 =
+* changed the post method to get method and added the Limit & offset querystring.
+* job object was modified.
+
 = 3.1.1 =
 Bug Fixes:
 * The code for the prior release was never checked in.
