@@ -131,4 +131,54 @@ namespace UCF\MainSiteUtilities\Commands {
 			}
 		}
 	}
+
+	class ArticleCommands extends \WP_CLI_Command {
+
+		/**
+		 * Converts pages using the old "Area of Focus Article" template to the new
+		 * "Article (Two Column)" template.
+		 *
+		 * Sidebar repeater fields (authors, interview, co-authors, references, related
+		 * programs) are serialized into HTML and stored in the new `sidebar_content`
+		 * WYSIWYG field. The `personal_response` repeater is mapped to the new `faqs`
+		 * repeater. The `abstract` field is shared between both templates and requires
+		 * no migration.
+		 *
+		 * ## OPTIONS
+		 *
+		 * [--post-id=<id>]
+		 * : Convert only the page(s) with the specified post ID(s). Accepts a single ID or a comma-separated list (e.g. 123,456,789).
+		 *
+		 * [--dry-run]
+		 * : Preview changes without writing any data.
+		 *
+		 * ## EXAMPLES
+		 *
+		 *     wp article convert
+		 *     wp article convert --post-id=123
+		 *     wp article convert --post-id=123,456,789
+		 *     wp article convert --dry-run
+		 *
+		 * @when after_wp_load
+		 */
+		public function convert( $args, $assoc_args ) {
+			$dry_run  = \WP_CLI\Utils\get_flag_value( $assoc_args, 'dry-run', false );
+			$post_ids = array();
+
+			if ( isset( $assoc_args['post-id'] ) ) {
+				$post_ids = array_filter(
+					array_map( 'intval', explode( ',', $assoc_args['post-id'] ) )
+				);
+			}
+
+			$converter = new Importers\ArticlesConverter( $post_ids, $dry_run );
+			$converter->convert();
+
+			foreach ( $converter->get_log() as $message ) {
+				\WP_CLI::log( $message );
+			}
+
+			\WP_CLI::success( $converter->get_stats() );
+		}
+	}
 }
