@@ -64,6 +64,10 @@ wp expert import
 
 == Changelog ==
 
+= 3.3.0 =
+Enhancements:
+* Added article template converter to move articles from the old to new template.
+
 = 3.2.1 =
 Bug Fixes:
 * Base url was changed in order to fix the outgoing links.
